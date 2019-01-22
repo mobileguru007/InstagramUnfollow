@@ -1,0 +1,61 @@
+<resources>
+    <string name="app_name">Instunfollow</string>
+    <string name="etLogin">Username</string>
+    <string name="etPassword">Password</string>
+    <string name="bLogin">Sign in</string>
+    <string name="Unfollow">Unfollow</string>
+    <string name="loginError">Authorization error</string>
+    <string name="bUnfollowAll">Unfollow first 10</string>
+    <string name="dialogUnfollowAll">Unfollow 10 Users?</string>
+    <string name="dialogLogOut">Do you want to sign out?</string>
+    <string name="stop">Stop</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="attention">Warning!</string>
+    <string name="logoDescription">logo</string>
+    <string name="backPressed">"Click BACK again to exit"</string>
+
+    <string name="ad_mob_id">ca-app-pub-8374032779878953~5394311618</string>
+    <string name="ad_mob_banner1_id">ca-app-pub-8374032779878953/4998671892</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="bottomnav_title_0">Unfollow</string>
+    <string name="bottomnav_title_1">WhiteList</string>
+    <string name="bottomnav_title_2">Share</string>
+    <string name="bottomnav_title_3">Reward</string>
+    <string name="bottomnav_title_4">My Account</string>
+    <string name="pref_name">INSTAGRAM_UNFOLLOWERS</string>
+    <string name="cancel">Cancel</string>
+    <string name="last_ten">Unfollow Last 25</string>
+    <string name="first_ten">Unfollow First 25</string>
+    <string name="logout">Logout</string>
+    <string name="non_followers">Non-Followers</string>
+    <string name="non_follow_description">People who you follow but they don\'t follow you back</string>
+    <string name="unfollowed">UnFollowed</string>
+    <string name="today_unfollowed_description">The number of people you unfollowed in the past 24 hours</string>
+    <string name="send_to">Share to…</string>
+    <string name="sharetitle">Subject Here</string>
+    <string name="add_to_whitelist">Add to Whitelist</string>
+    <string name="remove">Remove</string>
+    <string name="exit_alert">Are you sure to exit Instunfollow?</string>
+    <string name="warning">Warning</string>
+    <string name="ok">OK</string>
+    <string name="loading">We are currently gathering your info</string>
+    <string name="load">Loading…</string>
+    <string name="unfollow_1">Successfully Unfollowed: </string>
+    <string name="unfollow_10">%d Non Followers Successfully Unfollowed</string>
+    <string name="unfollow_1_fail">Failed to unfollow this user: </string>
+    <string name="unfollow_10_fail">Failed to unfollow 25 users!</string>
+    <string name="share_this_app_with_your_friends">Share this app with your friends</string>
+    <string name="privacy">Privacy Policy</string>
+    <string name="faq">FAQ</string>
+    <string name="watch">Watch</string>
+    <string name="reward_description">Engage with an ad to get token to unfollow 25 more people</string>
+    <string name="limited_unfollow_alert">You have exceeded the limit of today. If you want to unfollow more people, increase limit by watching reward videos.</string>
+    <string name="redeemed">Redeemed</string>
+    <string name="reward_success_alert">You have been rewarded, so that you can unfollow 25 more people! So, your unfollow creadit point is %d.</string>
+    <string name="reward_fail_alert">We are currently experiencing difficulties, please try again later</string>
+    <string name="followus">Follow Us</string>
+    <string name="limited_unfollow_one_hour_alert">You exceeded limit 100 users per hour. You need to wait 1 hour.</string>
+</resources>

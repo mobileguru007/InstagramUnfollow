@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.NavigationActivity">
+
+    <include layout="@layout/toolbar" />
+
+    <!--<com.it_tech613.zhe.instagramunfollow.bottom_nav_utils.NoSwipePager-->
+        <!--android:id="@+id/viewpager"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight="1"-->
+        <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+        <!--tools:background="#EFEFEF"/>-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <FrameLayout
+            android:id="@+id/frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/unfollow_btn_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/text_color_white"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/first10"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/first_ten"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:background="@drawable/whitebuttonselector"
+                android:textSize="15sp"
+                android:padding="10dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray"/>
+
+            <Button
+                android:id="@+id/last10"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/last_ten"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:background="@drawable/whitebuttonselector"
+                android:textSize="15sp"
+                android:padding="10dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray"/>
+
+            <LinearLayout
+                android:id="@+id/lay_followus"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <Button
+                    android:id="@+id/followus"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/followus"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:background="@drawable/whitebuttonselector"
+                    android:textSize="15sp"
+                    android:padding="10dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/gray"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/cancel_action"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="@string/cancel"
+                android:textAllCaps="false"
+                android:background="@drawable/whitebuttonselector"
+                android:textSize="15sp"
+                android:padding="10dp"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <com.aurelhubert.ahbottomnavigation.AHBottomNavigation
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"/>
+</LinearLayout>

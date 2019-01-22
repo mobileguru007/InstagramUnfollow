@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#973a9c</color>
+    <color name="colorPrimaryDark">#711a76</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="colorBackground">#eeeeee</color>
+    <color name="gray">#777777</color>
+    <color name="grey">#979292</color>
+    <color name="grey_pressed">#333333</color>
+    <color name="light_grey">#bbbbbb</color>
+    <color name="yourAccentColor">#d94be1</color>
+    <color name="text_color_white">#ffffff</color>
+    <color name="red">#c92323</color>
+    <color name="red_pressed">#711414</color>
+    <color name="grey_transparent">#55333333</color>
+</resources>
