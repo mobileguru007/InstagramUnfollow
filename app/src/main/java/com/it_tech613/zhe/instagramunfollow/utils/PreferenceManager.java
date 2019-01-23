@@ -68,15 +68,15 @@ public class PreferenceManager extends MultiDexApplication {
 
 
     public static void logoutManager(){
-        PreferenceManager.setIsSaved(false);
-        PreferenceManager.setUserName("");
-        PreferenceManager.setPassword("");
-        PreferenceManager.unfollowers=new ArrayList<>();
-        PreferenceManager.whitelist=new ArrayList<>();
-        PreferenceManager.following=new ArrayList<>();
-        PreferenceManager.followers=new ArrayList<>();
-        PreferenceManager.currentUser=new InstagramLoggedUser();
-        PreferenceManager.feedItems=new ArrayList<>();
+        setIsSaved(false);
+        setUserName("");
+        setPassword("");
+        unfollowers=new ArrayList<>();
+        whitelist=new ArrayList<>();
+        following=new ArrayList<>();
+        followers=new ArrayList<>();
+        currentUser=new InstagramLoggedUser();
+        feedItems=new ArrayList<>();
     }
 
     public static void checkLimit(){
@@ -171,7 +171,7 @@ public class PreferenceManager extends MultiDexApplication {
             Date one_hour_ago=new Date(System.currentTimeMillis() - (DAY_IN_MS));
             try {
                 Date that_time=dateFormat.parse(time);
-                if (that_time.before(one_hour_ago)) unfollow1_ids.remove(i);
+                if (that_time.after(one_hour_ago)) unfollow1_ids.remove(i);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -181,13 +181,13 @@ public class PreferenceManager extends MultiDexApplication {
 
     public static void addUnfollwed1_ids(long id){
         String key=getUserName()+seperater+"1";
-        Set<String> Unfollowed24_ids=new HashSet<String>(getUnfollwed1_ids());
+        Set<String> Unfollowed1_ids=new HashSet<String>(getUnfollwed1_ids());
         Date now=new Date();
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy:MM:dd_hh:mm");
-        Unfollowed24_ids.add(String.valueOf(id)+seperater+dateFormat.format(now));
+        Unfollowed1_ids.add(String.valueOf(id)+seperater+dateFormat.format(now));
         editor.remove(key);
         editor.apply();
-        editor.putStringSet(key,Unfollowed24_ids);
+        editor.putStringSet(key,Unfollowed1_ids);
         editor.apply();
     }
     public static void setUserName(String userName){
@@ -298,6 +298,17 @@ public class PreferenceManager extends MultiDexApplication {
         editor.remove(getUserName() + seperater + "list_redeemed");
         editor.apply();
         editor.putString(getUserName() + seperater + "list_redeemed", list.toString());
+        editor.apply();
+    }
+
+    public static String getAccessToken(){
+        return settings.getString(getUserName() + seperater + "access_token","");
+    }
+
+    public static void setAccessToken(String accessToken){
+        editor.remove(getUserName() + seperater + "access_token");
+        editor.apply();
+        editor.putString(getUserName() + seperater + "access_token",accessToken);
         editor.apply();
     }
 }

@@ -65,7 +65,6 @@ import dev.niekirk.com.instagram4android.requests.payload.InstagramUserSummary;
 
 public class NavigationActivity extends AppCompatActivity implements View.OnFocusChangeListener {
     private ConfirmExitDlg confirmExitDlg;
-    private List<AHBottomNavigationItem> items=new ArrayList<AHBottomNavigationItem>();
 
     AHBottomNavigation bottomNavigation;
     boolean notificationVisible=false;
@@ -75,6 +74,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
     DelayedProgressDialog spinner = new DelayedProgressDialog();
     LoadingDlg loadingDlg;
     CircleImageView userProfileImage;
+    String username="";
     private InterstitialAd mInterstitialAd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,8 +126,8 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
 
 //        createFakeNotification();
         bottomNavigation.removeAllItems();
+        bottomNavigation.refresh();
         addBottomNavigationItems();
-        bottomNavigation.addItems(items);
 
         // Setting the very 1st item as home screen.
 
@@ -136,18 +136,24 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
             public boolean onTabSelected(int position, boolean wasSelected) {
                 Fragment selectedFragment;
                 bottomNavigation.removeAllItems();
-                addBottomNavigationItems();
+                bottomNavigation.refresh();
                 ImageView refresh=findViewById(R.id.refresh);
                 switch (position){
                     case 0:
                         selectedFragment=UnfollowFragment.newInstance();
-                        items.remove(position);
-                        items.add(position,new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon_selected, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon_selected, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_2), R.drawable.share, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_3), R.drawable.badge ,R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile,R.color.colorPrimary));
                         break;
                     case 1:
                         selectedFragment=WhiteListFragment.newInstance();
-                        items.remove(position);
-                        items.add(position,new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact_selected, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact_selected, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_2), R.drawable.share, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_3), R.drawable.badge ,R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile,R.color.colorPrimary));
                         break;
                     case 2:
                         selectedFragment=ShareFragment.newInstance();
@@ -158,13 +164,19 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                                 loadData_following();
                             }
                         });
-                        items.remove(position);
-                        items.add(position,new AHBottomNavigationItem(getString(R.string.bottomnav_title_2), R.drawable.share_selected, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_2), R.drawable.share_selected, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_3), R.drawable.badge ,R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile,R.color.colorPrimary));
                         break;
                     case 3:
                         selectedFragment=RewardsFragment.newInstance();
-                        items.remove(position);
-                        items.add(position,new AHBottomNavigationItem(getString(R.string.bottomnav_title_3), R.drawable.badge_selected, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_2), R.drawable.share, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_3), R.drawable.badge_selected ,R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile,R.color.colorPrimary));
                         break;
                     case 4:
                         selectedFragment=MyAccountFragment.newInstance();
@@ -175,16 +187,21 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                                 loadData_following();
                             }
                         });
-                        items.remove(position);
-                        items.add(position,new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile_selected, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_2), R.drawable.share, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_3), R.drawable.badge ,R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile_selected,R.color.colorPrimary));
                         break;
                     default:
                         selectedFragment=UnfollowFragment.newInstance();
-                        items.remove(position);
-                        items.add(position,new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon_selected, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon_selected , R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact , R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_2), R.drawable.share, R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_3), R.drawable.badge ,R.color.colorPrimary));
+                        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile ,R.color.colorPrimary));
                         break;
                 }
-                bottomNavigation.addItems(items);
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame,selectedFragment).addToBackStack("tag").commitAllowingStateLoss();
 //                viewPager.setCurrentItem(position);
                 Log.e("selected_tab",position+"");
@@ -197,7 +214,6 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
             }
         });
         bottomNavigation.setCurrentItem(4);
-        spinner.cancel();
     }
 
     public void startLoginActivity() {
@@ -206,33 +222,34 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
 
     @SuppressLint("StaticFieldLeak")
     private void login(final String username, final String password) {
-        loadInterstitialAd();
+        this.username=username;
+//        loadInterstitialAd();
         loadingDlg=new LoadingDlg(this);
         loadingDlg.show();
         loadingDlg.setCancelable(false);
 //        spinner.show(getSupportFragmentManager(), "login");
 
-        PreferenceManager.instagram = Instagram4Android.builder()
-                .username(username)
-                .password(password)
-                .build();
-        PreferenceManager.instagram.setup();
         new AsyncTask<Void, Void, Void>() {
             InstagramLoginResult loginResult;
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
+                    PreferenceManager.instagram = Instagram4Android.builder()
+                            .username(username)
+                            .password(password)
+                            .build();
+                    PreferenceManager.instagram.setup();
                     loginResult = PreferenceManager.instagram.login();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Log.e("loginresult",loginResult.toString());
+                if(loginResult!=null) Log.e("loginresult",loginResult.toString());
                 return null;
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                if (!PreferenceManager.instagram.isLoggedIn()) {
+                if (loginResult==null || !PreferenceManager.instagram.isLoggedIn()) {
 //                    spinner.cancel();
                     if (loadingDlg!=null && loadingDlg.isShowing()) loadingDlg.dismiss();
                     Toast.makeText(getApplicationContext(), R.string.loginError, Toast.LENGTH_LONG).show();
@@ -282,9 +299,9 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        PreferenceManager.setLastLogin();
+    protected void onStop() {
+        super.onStop();
+        if (!username.equals("")) PreferenceManager.setLastLogin();
     }
 
     @Override
@@ -321,6 +338,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
             protected void onPostExecute(Void aVoid) {
                 PreferenceManager.following=following;
                 loadData_follower();
+                spinner.cancel();
             }
         }.execute();
     }
@@ -445,12 +463,11 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
 //    }
 
     private void addBottomNavigationItems() {
-        items=new ArrayList<>();
-        items.add(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon, R.color.colorPrimary));
-        items.add(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact, R.color.colorPrimary));
-        items.add(new AHBottomNavigationItem(getString(R.string.bottomnav_title_2), R.drawable.share, R.color.colorPrimary));
-        items.add(new AHBottomNavigationItem(getString(R.string.bottomnav_title_3), R.drawable.badge ,R.color.colorPrimary));
-        items.add(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile,R.color.colorPrimary));
+        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon, R.color.colorPrimary));
+        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact, R.color.colorPrimary));
+        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_2), R.drawable.share, R.color.colorPrimary));
+        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_3), R.drawable.badge ,R.color.colorPrimary));
+        bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile,R.color.colorPrimary));
     }
 
     public static Drawable drawableFromUrl(String url_str) throws IOException {

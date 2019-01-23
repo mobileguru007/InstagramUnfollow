@@ -23,6 +23,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.it_tech613.zhe.instagramunfollow.utils.LoadingDlg;
 import com.it_tech613.zhe.instagramunfollow.utils.UnfollowAdapter;
 import com.it_tech613.zhe.instagramunfollow.utils.DelayedProgressDialog;
 import com.it_tech613.zhe.instagramunfollow.utils.PreferenceManager;
@@ -43,6 +44,7 @@ public class UnfollowFragment extends Fragment {
     UnfollowAdapter adapter;
     ImageView unfollow;
     Random random = new Random();
+    LoadingDlg loadingDlg;
 
     AsyncTask unfollowingTask;
     boolean isUnfollowingActive = false;
@@ -81,7 +83,6 @@ public class UnfollowFragment extends Fragment {
         Button last10=getActivity().findViewById(R.id.last10);
         last10.setText(getResources().getString(R.string.last_ten));
         Button cancel=getActivity().findViewById(R.id.cancel_action);
-//        Button privacy=getActivity().findViewById(R.id.privacy);
         first10.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -302,6 +303,9 @@ public class UnfollowFragment extends Fragment {
     @SuppressLint("StaticFieldLeak")
     void unfollowTen(final boolean is_first) {
         loadInterstitialAd();
+        loadingDlg=new LoadingDlg(getActivity());
+        loadingDlg.show();
+        loadingDlg.setCancelable(false);
         InstagramUserSummary[] userIds;
         if (is_first) userIds = adapter.getFirstTwentyFiveUnfollowList();
         else userIds = adapter.getLastTwentyFiveUnfollowList();
@@ -365,19 +369,20 @@ public class UnfollowFragment extends Fragment {
             }
 
             void onStop(UnfollowStatus is_successed) {
+                if (loadingDlg!=null && loadingDlg.isShowing()) loadingDlg.dismiss();
                 unfollow.setClickable(true);
                 isUnfollowingActive = false;
                 adapter.setBlocked(false);
                 if (is_successed == UnfollowStatus.success) {
                     if (unfollowed_number[0]!=0) Toast.makeText(getContext(),String.format(getString(R.string.unfollow_10),unfollowed_number[0]),Toast.LENGTH_LONG).show();
                 } else if (is_successed == UnfollowStatus.failed) Toast.makeText(getContext(),getString(R.string.unfollow_10_fail),Toast.LENGTH_LONG).show();
+                spinner.cancel();
             }
         }.execute(userIds);
     }
 
     private void loadData() {
         adapter.setUsers(PreferenceManager.unfollowers, true);
-        spinner.cancel();
         refreshLayout.setRefreshing(false);
     }
 

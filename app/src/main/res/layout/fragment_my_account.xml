@@ -297,6 +297,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 app:adSize="BANNER"
+                android:visibility="gone"
                 app:adUnitId="ca-app-pub-7166764673125229/1725162365"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
