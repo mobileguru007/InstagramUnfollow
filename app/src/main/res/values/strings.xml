@@ -3,7 +3,7 @@
     <string name="etLogin">Username</string>
     <string name="etPassword">Password</string>
     <string name="bLogin">Sign in</string>
-    <string name="Unfollow">Unfollow</string>
+    <string name="unfollow">Unfollow</string>
     <string name="loginError">Authorization error</string>
     <string name="bUnfollowAll">Unfollow first 10</string>
     <string name="dialogUnfollowAll">Unfollow 10 Users?</string>
@@ -58,4 +58,9 @@
     <string name="reward_fail_alert">We are currently experiencing difficulties, please try again later</string>
     <string name="followus">Follow Us</string>
     <string name="limited_unfollow_one_hour_alert">You exceeded limit 100 users per hour. You need to wait 1 hour.</string>
+    <string name="unfollowing">Unfollowing</string>
+    <string name="unfollow_name">Unfollow: %s</string>
+    <string name="d_25">%d/25</string>
+    <string name="rateus">Rate Us</string>
+    <string name="share_description">Please support our app and share it with your friends</string>
 </resources>

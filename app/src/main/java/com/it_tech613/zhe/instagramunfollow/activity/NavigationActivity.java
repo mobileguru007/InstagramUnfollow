@@ -223,7 +223,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
     @SuppressLint("StaticFieldLeak")
     private void login(final String username, final String password) {
         this.username=username;
-//        loadInterstitialAd();
+        loadInterstitialAd();
         loadingDlg=new LoadingDlg(this);
         loadingDlg.show();
         loadingDlg.setCancelable(false);

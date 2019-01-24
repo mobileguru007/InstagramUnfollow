@@ -177,11 +177,12 @@
                     android:id="@+id/textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:text="@string/share_this_app_with_your_friends"
-                    android:textStyle="bold"
                     android:textSize="18sp"
-                    app:layout_constraintStart_toStartOf="@+id/textView2"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/imageView2"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
@@ -192,7 +193,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
-                    android:text="Share with Smart View, Smart Things, or nearby devices"
+                    android:text="@string/share_description"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imageView2"

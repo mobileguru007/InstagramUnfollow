@@ -23,12 +23,12 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
-import com.it_tech613.zhe.instagramunfollow.utils.LoadingDlg;
 import com.it_tech613.zhe.instagramunfollow.utils.UnfollowAdapter;
 import com.it_tech613.zhe.instagramunfollow.utils.DelayedProgressDialog;
 import com.it_tech613.zhe.instagramunfollow.utils.PreferenceManager;
 import com.it_tech613.zhe.instagramunfollow.R;
 import com.it_tech613.zhe.instagramunfollow.utils.UnfollowStatus;
+import com.it_tech613.zhe.instagramunfollow.utils.UnfollowingDlg;
 
 import java.util.Random;
 
@@ -44,7 +44,7 @@ public class UnfollowFragment extends Fragment {
     UnfollowAdapter adapter;
     ImageView unfollow;
     Random random = new Random();
-    LoadingDlg loadingDlg;
+    UnfollowingDlg unfollowingDlg;
 
     AsyncTask unfollowingTask;
     boolean isUnfollowingActive = false;
@@ -303,20 +303,32 @@ public class UnfollowFragment extends Fragment {
     @SuppressLint("StaticFieldLeak")
     void unfollowTen(final boolean is_first) {
         loadInterstitialAd();
-        loadingDlg=new LoadingDlg(getActivity());
-        loadingDlg.show();
-        loadingDlg.setCancelable(false);
         InstagramUserSummary[] userIds;
+        unfollowingDlg =new UnfollowingDlg(getActivity());
+        unfollowingDlg.show();
+        unfollowingDlg.setCancelable(false);
         if (is_first) userIds = adapter.getFirstTwentyFiveUnfollowList();
         else userIds = adapter.getLastTwentyFiveUnfollowList();
         final int[] unfollowed_number = {0};
         unfollowingTask = new AsyncTask<InstagramUserSummary[], Void, UnfollowStatus>() {
             @Override
             protected UnfollowStatus doInBackground(InstagramUserSummary[]... longs) {
-                for (final InstagramUserSummary user : longs[0]) {
+                for (int i=0; i<longs[0].length; i++) {
+                    final InstagramUserSummary user=longs[0][i];
                     if (isCancelled())
                         return null;
                     try {
+                        final int finalI = i;
+                        getActivity().runOnUiThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+
+                                // Stuff that updates the UI
+                                unfollowingDlg.setProgress(user.getFull_name(), finalI);
+                            }
+                        });
+
                         Thread.sleep(random.nextInt(5) * 1000);
                         final UnfollowStatus result=PreferenceManager.unfollow(user);
                         if (result==UnfollowStatus.success){
@@ -369,7 +381,7 @@ public class UnfollowFragment extends Fragment {
             }
 
             void onStop(UnfollowStatus is_successed) {
-                if (loadingDlg!=null && loadingDlg.isShowing()) loadingDlg.dismiss();
+                if (unfollowingDlg !=null && unfollowingDlg.isShowing()) unfollowingDlg.dismiss();
                 unfollow.setClickable(true);
                 isUnfollowingActive = false;
                 adapter.setBlocked(false);

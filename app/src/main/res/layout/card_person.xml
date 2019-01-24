@@ -43,7 +43,7 @@
         android:backgroundTint="@color/colorPrimary"
         android:elevation="1dp"
         android:textColor="@android:color/white"
-        android:text="@string/Unfollow"
+        android:text="@string/unfollow"
         android:textAllCaps="false"
         android:textSize="12sp" />
 

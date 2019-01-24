@@ -78,6 +78,7 @@ public class MyAccountFragment extends Fragment{
         LinearLayout lay_followus=getActivity().findViewById(R.id.lay_followus);
         lay_followus.setVisibility(View.VISIBLE);
         Button followus=getActivity().findViewById(R.id.followus);
+        Button rateus=getActivity().findViewById(R.id.rateus);
         Button first10=getActivity().findViewById(R.id.first10);
         first10.setText(getResources().getString(R.string.privacy));
         Button last10=getActivity().findViewById(R.id.last10);
@@ -117,6 +118,21 @@ public class MyAccountFragment extends Fragment{
                     }
                 } catch (PackageManager.NameNotFoundException ignored) {}
                 intent.setData(Uri.parse("https://www.instagram.com/inst_unfollow/"));
+                startActivity(intent);
+            }
+        });
+        rateus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                unfollow_btn_group.setVisibility(View.GONE);
+                final Intent intent = new Intent(Intent.ACTION_VIEW);
+                try {
+                    if (getContext().getPackageManager().getPackageInfo("com.android.vending", 0) != null) {
+                        intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.it_tech613.zhe.instagramunfollow"));
+                        intent.setPackage("com.android.vending");
+                    }
+                } catch (PackageManager.NameNotFoundException ignored) {}
+                intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.it_tech613.zhe.instagramunfollow"));
                 startActivity(intent);
             }
         });
