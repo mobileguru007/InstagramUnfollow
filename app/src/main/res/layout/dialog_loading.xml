@@ -48,18 +48,34 @@
                 app:SpinKit_Color="@color/colorPrimary" />
 
         </LinearLayout>
-        <com.google.android.gms.ads.AdView
-            xmlns:ads="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/adView"
-            android:layout_below="@id/coloum_1"
-            android:layout_gravity="center_horizontal"
+        <!--<com.google.android.gms.ads.AdView-->
+            <!--xmlns:ads="http://schemas.android.com/apk/res-auto"-->
+            <!--android:id="@+id/adView"-->
+            <!--android:layout_below="@id/coloum_1"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="15dp"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--ads:adSize="BANNER"-->
+            <!--ads:adUnitId="ca-app-pub-7166764673125229/1725162365">-->
+        <!--</com.google.android.gms.ads.AdView>-->
+        <TextView
+            android:id="@+id/msg1"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:layout_centerHorizontal="true"
-            ads:adSize="BANNER"
-            ads:adUnitId="ca-app-pub-7166764673125229/1725162365">
-        </com.google.android.gms.ads.AdView>
+            android:layout_centerInParent="true"
+            android:layout_below="@id/coloum_1"/>
+        <TextView
+            android:id="@+id/msg2"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_centerInParent="true"
+            android:layout_below="@id/msg1"/>
     </RelativeLayout>
 
 </RelativeLayout>

@@ -1,11 +1,13 @@
 package com.it_tech613.zhe.instagramunfollow.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -26,6 +28,8 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.it_tech613.zhe.instagramunfollow.activity.LoginActivity;
+import com.it_tech613.zhe.instagramunfollow.activity.NavigationActivity;
+import com.it_tech613.zhe.instagramunfollow.utils.ConfirmExitDlg;
 import com.it_tech613.zhe.instagramunfollow.utils.PreferenceManager;
 import com.it_tech613.zhe.instagramunfollow.R;
 import com.it_tech613.zhe.instagramunfollow.utils.UnfollowStatus;
@@ -39,7 +43,7 @@ import dev.niekirk.com.instagram4android.requests.payload.InstagramUserSummary;
 
 public class MyAccountFragment extends Fragment{
 
-    TextView num_followers,num_following,num_posts,username,num_non_follower, today_unfollowed;
+    TextView num_followers,num_following,username,num_non_follower, today_unfollowed;//num_posts,
     AdView adView;
     CircleImageView user_profile;
     Button logout;
@@ -48,7 +52,8 @@ public class MyAccountFragment extends Fragment{
     boolean isUnfollowingActive = false;
     Random random = new Random();
     private LinearLayout unfollow_btn_group;
-
+    ConfirmExitDlg confirmExitDlg;
+    ConstraintLayout constraintLayout;
     public static MyAccountFragment newInstance() {
         MyAccountFragment fragment = new MyAccountFragment();
         return fragment;
@@ -88,14 +93,16 @@ public class MyAccountFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 unfollow_btn_group.setVisibility(View.GONE);
+                PreferenceManager.webviewUri="file:///android_asset/html/privacy_policy.html";
                 FragmentTransaction fragmentTransaction=getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frame,PrivacyPolicyFragment.newInstance()).addToBackStack("tag").commit();
+                fragmentTransaction.replace(R.id.frame,FaqFragment.newInstance()).addToBackStack("tag").commit();
             }
         });
         last10.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 unfollow_btn_group.setVisibility(View.GONE);
+                PreferenceManager.webviewUri="file:///android_asset/html/faq.html";
                 FragmentTransaction fragmentTransaction=getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.frame,FaqFragment.newInstance()).addToBackStack("tag").commit();
             }
@@ -136,11 +143,12 @@ public class MyAccountFragment extends Fragment{
                 startActivity(intent);
             }
         });
+        constraintLayout=view.findViewById(R.id.constraintLayout);
         logout=view.findViewById(R.id.logout);
         user_profile=view.findViewById(R.id.user_profile);
         num_followers=view.findViewById(R.id.num_followers);
         num_following=view.findViewById(R.id.num_following);
-        num_posts=view.findViewById(R.id.num_posts);
+//        num_posts=view.findViewById(R.id.num_posts);
         username=view.findViewById(R.id.username);
         num_non_follower=view.findViewById(R.id.num_non_follower);
         today_unfollowed=view.findViewById(R.id.today_unfollowed);
@@ -163,7 +171,7 @@ public class MyAccountFragment extends Fragment{
                 .into(user_profile);
         num_followers.setText(String.valueOf(PreferenceManager.followers.size()));
         num_following.setText(String.valueOf(PreferenceManager.following.size()));
-        num_posts.setText(String.valueOf(PreferenceManager.feedItems.size()));
+//        num_posts.setText(String.valueOf(PreferenceManager.feedItems.size()));
         username.setText(PreferenceManager.getUserName());
         num_non_follower.setText(String.valueOf(PreferenceManager.unfollowers.size()+PreferenceManager.whitelist.size()));
         adView = view.findViewById(R.id.adView);
@@ -171,6 +179,28 @@ public class MyAccountFragment extends Fragment{
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         adView.loadAd(adRequest);
+        constraintLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmExitDlg =new ConfirmExitDlg(
+                        getContext(),
+                        new ConfirmExitDlg.DialogNumberListener() {
+                            @Override
+                            public void OnYesClick(Dialog dialog) {
+                                confirmExitDlg.dismiss();
+                            }
+
+                            @Override
+                            public void OnCancelClick(Dialog dialog) {
+                                confirmExitDlg.dismiss();
+                            }
+                        },
+                        getResources().getString(R.string.upgrade),
+                        getResources().getString(R.string.upgrade_description),
+                        false);
+                confirmExitDlg.show();
+            }
+        });
 //        adView.setAdListener(new AdListener() {
 //
 //            @Override

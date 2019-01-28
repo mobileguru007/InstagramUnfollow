@@ -10,6 +10,29 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/gray"
+            android:padding="10dp">
+            <TextView
+                android:id="@+id/free_credit"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="@string/free_credit_d"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/text_color_white"/>
+            <TextView
+                android:id="@+id/reward_credit"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="@string/reward_credit_d"
+                android:layout_marginEnd="10dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_color_white"/>
+        </LinearLayout>
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/refreshLayout"
             android:layout_width="match_parent"

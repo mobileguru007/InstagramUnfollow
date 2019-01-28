@@ -1,7 +1,9 @@
 package com.it_tech613.zhe.instagramunfollow.activity;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,6 +30,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.it_tech613.zhe.instagramunfollow.utils.AlarmReceiver;
 import com.it_tech613.zhe.instagramunfollow.utils.ConfirmExitDlg;
 import com.it_tech613.zhe.instagramunfollow.utils.DelayedProgressDialog;
 import com.it_tech613.zhe.instagramunfollow.utils.LoadingDlg;
@@ -48,6 +51,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -65,8 +69,10 @@ import dev.niekirk.com.instagram4android.requests.payload.InstagramUserSummary;
 
 public class NavigationActivity extends AppCompatActivity implements View.OnFocusChangeListener {
     private ConfirmExitDlg confirmExitDlg;
-
+    AlarmManager alarmManager;
     AHBottomNavigation bottomNavigation;
+    private PendingIntent pendingIntent;
+    private static NavigationActivity inst;
     boolean notificationVisible=false;
 //    NoSwipePager viewPager;
 //    BottomBarAdapter pagerAdapter;
@@ -76,6 +82,17 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
     CircleImageView userProfileImage;
     String username="";
     private InterstitialAd mInterstitialAd;
+
+    public static NavigationActivity instance() {
+        return inst;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        inst = this;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +108,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
             login(PreferenceManager.getUserName(),
                     PreferenceManager.getPassword());
         else
-            startLoginActivity();
+            startLoginActivity(false);
     }
 
     private void loadInterstitialAd() {
@@ -161,7 +178,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                             @Override
                             public void onClick(View v) {
                                 spinner.show(getSupportFragmentManager(), "login");
-                                loadData_following();
+                                loadData_following(false);
                             }
                         });
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon, R.color.colorPrimary));
@@ -184,7 +201,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                             @Override
                             public void onClick(View v) {
                                 spinner.show(getSupportFragmentManager(), "login");
-                                loadData_following();
+                                loadData_following(false);
                             }
                         });
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon, R.color.colorPrimary));
@@ -216,14 +233,16 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
         bottomNavigation.setCurrentItem(4);
     }
 
-    public void startLoginActivity() {
-        startActivityForResult(new Intent(this, LoginActivity.class), 0);
+    public void startLoginActivity(boolean show_faq) {
+        Intent intent=new Intent(this, LoginActivity.class);
+        intent.putExtra("show_faq",show_faq);
+        startActivityForResult(intent, 0);
     }
 
     @SuppressLint("StaticFieldLeak")
     private void login(final String username, final String password) {
         this.username=username;
-        loadInterstitialAd();
+//        loadInterstitialAd();
         loadingDlg=new LoadingDlg(this);
         loadingDlg.show();
         loadingDlg.setCancelable(false);
@@ -253,8 +272,14 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
 //                    spinner.cancel();
                     if (loadingDlg!=null && loadingDlg.isShowing()) loadingDlg.dismiss();
                     Toast.makeText(getApplicationContext(), R.string.loginError, Toast.LENGTH_LONG).show();
-                    startLoginActivity();
+                    startLoginActivity(true);
                 } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingDlg.setMsg_1(getString(R.string.login_success));
+                        }
+                    });
                     PreferenceManager.currentUser=loginResult.getLogged_in_user();
                     RequestOptions requestOptions = new RequestOptions();
                     requestOptions.placeholder(R.drawable.profile);
@@ -263,7 +288,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                     Glide.with(NavigationActivity.this)
                             .load(PreferenceManager.currentUser.getProfile_pic_url())
                             .into(userProfileImage);
-                    loadData_following();
+                    loadData_following(true);
 //                    tvUsername.setText(username);
                     if (!PreferenceManager.isSaved()) {
                         PreferenceManager.setIsSaved(true);
@@ -281,7 +306,9 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
         super.onBackPressed();
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.frame);
         if(fragment == null) {
-            confirmExitDlg =new ConfirmExitDlg(NavigationActivity.this, new ConfirmExitDlg.DialogNumberListener() {
+            confirmExitDlg =new ConfirmExitDlg(
+                    NavigationActivity.this,
+                    new ConfirmExitDlg.DialogNumberListener() {
                 @Override
                 public void OnYesClick(Dialog dialog) {
                     confirmExitDlg.dismiss();
@@ -293,7 +320,10 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                 public void OnCancelClick(Dialog dialog) {
                     confirmExitDlg.dismiss();
                 }
-            });
+            },
+                    getResources().getString(R.string.warning),
+                    getResources().getString(R.string.exit_alert),
+                    false);
             confirmExitDlg.show();
         }
     }
@@ -302,6 +332,9 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
     protected void onStop() {
         super.onStop();
         if (!username.equals("")) PreferenceManager.setLastLogin();
+        //Daily Push Notification
+        AlarmReceiver.setCtx(getApplicationContext());
+        AlarmReceiver.setAlarm(true);
     }
 
     @Override
@@ -314,7 +347,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
     }
 
     @SuppressLint("StaticFieldLeak")
-    void loadData_following() {
+    void loadData_following(final boolean go_on) {
         new AsyncTask<Void, Void, Void>() {
             ArrayList<InstagramUserSummary> following = new ArrayList<>();
             @Override
@@ -324,9 +357,21 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                 try {
                     result = PreferenceManager.instagram.sendRequest(new InstagramGetUserFollowingRequest(userId));
                     following.addAll(result.getUsers());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingDlg.setMsg_1(following.size()+" followings scanned...");
+                        }
+                    });
                     while (result.getNext_max_id() != null){
                         result = PreferenceManager.instagram.sendRequest(new InstagramGetUserFollowingRequest(userId, result.getNext_max_id()));
                         following.addAll(result.getUsers());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingDlg.setMsg_1(following.size()+" followings scanned...");
+                            }
+                        });
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -337,8 +382,8 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
             @Override
             protected void onPostExecute(Void aVoid) {
                 PreferenceManager.following=following;
-                loadData_follower();
-                spinner.cancel();
+                if (go_on)loadData_follower();
+                else endGetData();
             }
         }.execute();
     }
@@ -354,9 +399,21 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                 try {
                     result = PreferenceManager.instagram.sendRequest(new InstagramGetUserFollowersRequest(userId));
                     followers.addAll(result.getUsers());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingDlg.setMsg_2(followers.size()+" followers scanned...");
+                        }
+                    });
                     while (result.getNext_max_id() != null){
                         result = PreferenceManager.instagram.sendRequest(new InstagramGetUserFollowersRequest(userId, result.getNext_max_id()));
                         followers.addAll(result.getUsers());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingDlg.setMsg_2(followers.size()+" followers scanned...");
+                            }
+                        });
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -367,28 +424,34 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
             @Override
             protected void onPostExecute(Void aVoid) {
                 PreferenceManager.followers=followers;
-                ArrayList<InstagramUserSummary> unfollowers = new ArrayList<>(PreferenceManager.following);
-                for (InstagramUserSummary i : PreferenceManager.following) {
-                    Set<String> whitelist=PreferenceManager.getWhitelist_ids();
-                    ArrayList<String> whitelist_ids=new ArrayList<>(whitelist);
-                    for (String id:whitelist_ids){
-                        if (Long.valueOf(id)==i.getPk()) {
-                            PreferenceManager.whitelist.add(i);
-                            unfollowers.remove(i);
-                            break;
-                        }
-                    }
-                    for (InstagramUserSummary j : followers) {
-                        if (i.equals(j)) {
-                            unfollowers.remove(i);
-                            break;
-                        }
-                    }
-                }
-                PreferenceManager.unfollowers=unfollowers;
-                loadData_post();
+                endGetData();
             }
         }.execute();
+    }
+
+    private void endGetData() {
+        ArrayList<InstagramUserSummary> unfollowers = new ArrayList<>(PreferenceManager.following);
+        for (InstagramUserSummary i : PreferenceManager.following) {
+            Set<String> whitelist=PreferenceManager.getWhitelist_ids();
+            ArrayList<String> whitelist_ids=new ArrayList<>(whitelist);
+            for (String id:whitelist_ids){
+                if (Long.valueOf(id)==i.getPk()) {
+                    PreferenceManager.whitelist.add(i);
+                    unfollowers.remove(i);
+                    break;
+                }
+            }
+            for (InstagramUserSummary j : PreferenceManager.followers) {
+                if (i.equals(j)) {
+                    unfollowers.remove(i);
+                    break;
+                }
+            }
+        }
+        PreferenceManager.unfollowers=unfollowers;
+        if (loadingDlg!=null && loadingDlg.isShowing()) loadingDlg.dismiss();
+        setUpGUI();
+        spinner.cancel();
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -422,7 +485,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK)
-            startLoginActivity();
+            startLoginActivity(false);
         else
             login(data.getStringExtra("username"),
                     data.getStringExtra("password"));

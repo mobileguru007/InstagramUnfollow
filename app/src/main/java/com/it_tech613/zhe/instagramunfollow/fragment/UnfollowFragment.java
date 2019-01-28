@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
@@ -45,7 +46,7 @@ public class UnfollowFragment extends Fragment {
     ImageView unfollow;
     Random random = new Random();
     UnfollowingDlg unfollowingDlg;
-
+    TextView free_credit_d,reward_credit_d;
     AsyncTask unfollowingTask;
     boolean isUnfollowingActive = false;
     AdView adView;
@@ -121,11 +122,16 @@ public class UnfollowFragment extends Fragment {
                 loadData();
             }
         });
-
+        reward_credit_d=view.findViewById(R.id.reward_credit);
+        free_credit_d=view.findViewById(R.id.free_credit);
         unfollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Unfollow10();
+                if (isUnfollowingActive)
+                    unfollowingTask.cancel(false);
+                else {
+                    unfollow_btn_group.setVisibility(View.VISIBLE);
+                }
             }
         });
         toolbar = view.findViewById(R.id.toolbar);
@@ -147,6 +153,7 @@ public class UnfollowFragment extends Fragment {
                                     Toast.makeText(getActivity().getBaseContext(),getString(R.string.unfollow_1_fail)+userSummary.getFull_name(),Toast.LENGTH_LONG).show();
                                 } else  if (result==UnfollowStatus.limited) Toast.makeText(getActivity().getBaseContext(),getString(R.string.limited_unfollow_alert),Toast.LENGTH_LONG).show();
                                 else Toast.makeText(getActivity().getBaseContext(),getString(R.string.limited_unfollow_one_hour_alert),Toast.LENGTH_LONG).show();
+                                showCredits();
                             }
                         });
 
@@ -237,6 +244,13 @@ public class UnfollowFragment extends Fragment {
 //                Toast.makeText(getActivity(), "onAdLeftApplication()", Toast.LENGTH_SHORT).show();
 //            }
 //        });
+        showCredits();
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void showCredits(){
+        free_credit_d.setText(String.format(getResources().getString(R.string.free_credit_d),PreferenceManager.getFreeLimit()));
+        reward_credit_d.setText(String.format(getResources().getString(R.string.reward_credit_d),PreferenceManager.getRewardLimit()));
     }
 
     private void loadInterstitialAd() {
@@ -292,14 +306,6 @@ public class UnfollowFragment extends Fragment {
         super.onDestroy();
     }
 
-    public void Unfollow10() {
-        if (isUnfollowingActive)
-            unfollowingTask.cancel(false);
-        else {
-            unfollow_btn_group.setVisibility(View.VISIBLE);
-        }
-    }
-
     @SuppressLint("StaticFieldLeak")
     void unfollowTen(final boolean is_first) {
         loadInterstitialAd();
@@ -335,6 +341,13 @@ public class UnfollowFragment extends Fragment {
                             if (is_first)adapter.removeItem(0);
                             else adapter.removeItem(adapter.getItemCount()-1);
                             unfollowed_number[0] +=1;
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showCredits();
+                                }
+                            });
+
                         }else  {
                             getActivity().runOnUiThread(new Runnable() {
                                 public void run() {

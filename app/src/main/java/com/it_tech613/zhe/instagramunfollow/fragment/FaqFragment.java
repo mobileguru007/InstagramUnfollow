@@ -13,6 +13,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.it_tech613.zhe.instagramunfollow.R;
+import com.it_tech613.zhe.instagramunfollow.utils.PreferenceManager;
 
 
 public class FaqFragment extends Fragment {
@@ -32,7 +33,7 @@ public class FaqFragment extends Fragment {
     private void initWidget(View view){
         WebView webView = (WebView)view.findViewById(R.id.webview);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl("file:///android_asset/html/faq.html");
+        webView.loadUrl(PreferenceManager.webviewUri);
         webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // chromium, enable hardware acceleration
@@ -43,5 +44,6 @@ public class FaqFragment extends Fragment {
         }
         webView.setWebViewClient(new WebViewClient());
         webView.setBackgroundColor(Color.TRANSPARENT);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
     }
 }

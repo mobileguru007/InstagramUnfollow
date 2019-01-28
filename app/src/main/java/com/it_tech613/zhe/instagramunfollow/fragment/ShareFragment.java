@@ -20,7 +20,7 @@ import com.it_tech613.zhe.instagramunfollow.R;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ShareFragment extends Fragment {
-    TextView num_followers,num_following,num_posts,username;
+    TextView num_followers,num_following,username;//num_posts,
     CircleImageView user_profile;
 
     public static ShareFragment newInstance() {
@@ -50,7 +50,7 @@ public class ShareFragment extends Fragment {
         user_profile=view.findViewById(R.id.user_profile);
         num_followers=view.findViewById(R.id.num_followers);
         num_following=view.findViewById(R.id.num_following);
-        num_posts=view.findViewById(R.id.num_posts);
+//        num_posts=view.findViewById(R.id.num_posts);
         username=view.findViewById(R.id.username);
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.placeholder(R.drawable.profile);
@@ -60,7 +60,7 @@ public class ShareFragment extends Fragment {
                 .into(user_profile);
         num_followers.setText(String.valueOf(PreferenceManager.followers.size()));
         num_following.setText(String.valueOf(PreferenceManager.following.size()));
-        num_posts.setText(String.valueOf(PreferenceManager.feedItems.size()));
+//        num_posts.setText(String.valueOf(PreferenceManager.feedItems.size()));
         username.setText(PreferenceManager.getUserName());
         share();
         ConstraintLayout share_device=view.findViewById(R.id.share_device);

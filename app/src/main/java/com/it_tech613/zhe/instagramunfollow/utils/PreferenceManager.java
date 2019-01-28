@@ -37,6 +37,7 @@ public class PreferenceManager extends MultiDexApplication {
     public static InstagramLoggedUser currentUser;
     public static ArrayList<InstagramFeedItem> feedItems;
     public static ArrayList<Boolean> list_redeemed=new ArrayList<>();
+    public static String webviewUri="";
     private static SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy:MM:dd_hh:mm");
     public static int free_limit_perday=100;
     public static int free_limit_perhour=100;
@@ -87,22 +88,27 @@ public class PreferenceManager extends MultiDexApplication {
             Date valid_date=new Date(last_login.getTime()+(24*60*60*1000));
             //if one day more time passed
             if (valid_date.before(new Date())) {
-                setFreeLimit(free_limit_perday);
-                ArrayList<Boolean> list_redeemed=new ArrayList<>();
-                list_redeemed.add(false);
-                list_redeemed.add(false);
-                list_redeemed.add(false);
-                list_redeemed.add(false);
-                list_redeemed.add(false);
-                list_redeemed.add(false);
-                list_redeemed.add(false);
-                list_redeemed.add(false);
-                setListRedeemed(list_redeemed);
+                restoreFreeCreadit();
             }
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
+
+    public static void restoreFreeCreadit() {
+        setFreeLimit(free_limit_perday);
+        ArrayList<Boolean> list_redeemed=new ArrayList<>();
+        list_redeemed.add(false);
+        list_redeemed.add(false);
+        list_redeemed.add(false);
+        list_redeemed.add(false);
+        list_redeemed.add(false);
+        list_redeemed.add(false);
+        list_redeemed.add(false);
+        list_redeemed.add(false);
+        setListRedeemed(list_redeemed);
+    }
+
     public static Set<String> getWhitelist_ids() {
         String key=getUserName();
         return settings.getStringSet(key,new HashSet<String>());
@@ -234,8 +240,8 @@ public class PreferenceManager extends MultiDexApplication {
             following.remove(userSummary);
             addUnfollwed24_ids(userSummary.getPk());
             addUnfollwed1_ids(userSummary.getPk());
-            if (getRewardLimit()!=0) setRewardLimit(getRewardLimit()-1);
-            else if (getRewardLimit()==0 && getFreeLimit()!=0) setFreeLimit(getFreeLimit()-1);
+            if (getFreeLimit()!=0) setFreeLimit(getFreeLimit()-1);
+            else if (getRewardLimit()!=0 && getFreeLimit()==0) setRewardLimit(getRewardLimit()-1);
             return UnfollowStatus.success;
         } catch (IOException e) {
             e.printStackTrace();

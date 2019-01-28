@@ -51,7 +51,7 @@
     <string name="privacy">Privacy Policy</string>
     <string name="faq">FAQ</string>
     <string name="watch">Watch</string>
-    <string name="reward_description">Engage with an ad to get token to unfollow 25 more people</string>
+    <string name="reward_description">View an ad to get token to unfollow 25 more people</string>
     <string name="limited_unfollow_alert">You have exceeded the limit of today. If you want to unfollow more people, increase limit by watching reward videos.</string>
     <string name="redeemed">Redeemed</string>
     <string name="reward_success_alert">You have been rewarded, so that you can unfollow 25 more people! So, your unfollow creadit point is %d.</string>
@@ -63,4 +63,9 @@
     <string name="d_25">%d/25</string>
     <string name="rateus">Rate Us</string>
     <string name="share_description">Please support our app and share it with your friends</string>
+    <string name="login_success">Login Successful!</string>
+    <string name="free_credit_d">Free Credit: %d</string>
+    <string name="reward_credit_d">Reward Credit: %d</string>
+    <string name="upgrade">Upgrade to Pro Version, and you get the following:</string>
+    <string name="upgrade_description">\n  1) Ad-free\n  2) 400 daily Unfollow credits\n 3) Unlimited multiple accounts\n 4) A list of the people who used to follow you and recently unfollowed you in the past 24 hours.</string>
 </resources>
