@@ -44,8 +44,8 @@ public abstract class UnfollowAdapter extends RecyclerView.Adapter<UnfollowAdapt
         }
     }
 
-    public InstagramUserSummary[] getFirstTwentyFiveUnfollowList() {
-        int count = getItemCount() >= 25 ? 25 : getItemCount();
+    public InstagramUserSummary[] getFirstFiftyUnfollowList() {
+        int count = getItemCount() >= 50 ? 50 : getItemCount();
         if (count == 0)
             return new InstagramUserSummary[] {new InstagramUserSummary()};
 
@@ -55,8 +55,8 @@ public abstract class UnfollowAdapter extends RecyclerView.Adapter<UnfollowAdapt
         return result;
     }
 
-    public InstagramUserSummary[] getLastTwentyFiveUnfollowList() {
-        int count = getItemCount() >= 25 ? 25 : getItemCount();
+    public InstagramUserSummary[] getLastFiftyUnfollowList() {
+        int count = getItemCount() >= 50 ? 50 : getItemCount();
         if (count == 0)
             return new InstagramUserSummary[] {new InstagramUserSummary()};
 
@@ -146,7 +146,9 @@ public abstract class UnfollowAdapter extends RecyclerView.Adapter<UnfollowAdapt
                 if (isBlocked)
                     return;
                 Context context = holder.layout.getContext();
-                context.startActivity(openProfile(users.get(holder.getAdapterPosition()).getUsername(),
+                int position_item=holder.getAdapterPosition();
+                if(position_item==-1) return;
+                context.startActivity(openProfile(users.get(position_item).getUsername(),
                         context));
             }
         });

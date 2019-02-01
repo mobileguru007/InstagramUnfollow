@@ -45,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:progress="12"
-                android:max="25"/>
+                android:max="50"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -61,7 +61,7 @@
                     android:id="@+id/unfollow_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/d_25"
+                    android:text="@string/d_50"
                     android:layout_alignParentEnd="true"/>
             </RelativeLayout>
         </LinearLayout>

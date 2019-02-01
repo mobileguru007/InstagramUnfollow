@@ -1,12 +1,10 @@
 package com.it_tech613.zhe.instagramunfollow.utils;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.support.multidex.MultiDexApplication;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.ads.MobileAds;
 import com.it_tech613.zhe.instagramunfollow.R;
@@ -19,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import dev.niekirk.com.instagram4android.Instagram4Android;
 import dev.niekirk.com.instagram4android.requests.InstagramUnfollowRequest;
@@ -38,11 +37,15 @@ public class PreferenceManager extends MultiDexApplication {
     public static ArrayList<InstagramFeedItem> feedItems;
     public static ArrayList<Boolean> list_redeemed=new ArrayList<>();
     public static String webviewUri="";
-    private static SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy:MM:dd_hh:mm");
+    private static SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy:MM:dd_hh:mm aa");
     public static int free_limit_perday=100;
-    public static int free_limit_perhour=100;
+    public static int limit_perhour =100;
+    public static int limit_per12hour =200;
     private static String seperater=";;";
     public static File myDir;
+    public static boolean is_credit_noti_showed=false;
+    public static boolean is_rateus_noti_showed=false;
+    public static int left_time_12limit=12;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -88,14 +91,14 @@ public class PreferenceManager extends MultiDexApplication {
             Date valid_date=new Date(last_login.getTime()+(24*60*60*1000));
             //if one day more time passed
             if (valid_date.before(new Date())) {
-                restoreFreeCreadit();
+                restoreFreeCredit();
             }
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
 
-    public static void restoreFreeCreadit() {
+    public static void restoreFreeCredit() {
         setFreeLimit(free_limit_perday);
         ArrayList<Boolean> list_redeemed=new ArrayList<>();
         list_redeemed.add(false);
@@ -104,8 +107,8 @@ public class PreferenceManager extends MultiDexApplication {
         list_redeemed.add(false);
         list_redeemed.add(false);
         list_redeemed.add(false);
-        list_redeemed.add(false);
-        list_redeemed.add(false);
+//        list_redeemed.add(false);
+//        list_redeemed.add(false);
         setListRedeemed(list_redeemed);
     }
 
@@ -159,7 +162,6 @@ public class PreferenceManager extends MultiDexApplication {
         String key=getUserName()+seperater+"24";
         Set<String> Unfollowed24_ids=new HashSet<String>(getUnfollwed24_ids());
         Date now=new Date();
-        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy:MM:dd_hh:mm");
         Unfollowed24_ids.add(String.valueOf(id)+seperater+dateFormat.format(now));
         editor.remove(key);
         editor.apply();
@@ -167,17 +169,17 @@ public class PreferenceManager extends MultiDexApplication {
         editor.apply();
     }
 
-    public static ArrayList<String> getUnfollwed1_ids() {
+    public static ArrayList<String> getUnfollwed1Hour_ids() {
         String key=getUserName()+seperater+"1";
         Set<String> Unfollowed_ids=settings.getStringSet(key,new HashSet<String>());
         ArrayList<String> unfollow1_ids=new ArrayList<>(Unfollowed_ids);
         for (int i=0;i<unfollow1_ids.size();i++){
             String time=unfollow1_ids.get(i).split(seperater)[1];
-            long DAY_IN_MS = 1000 * 60 * 60;
-            Date one_hour_ago=new Date(System.currentTimeMillis() - (DAY_IN_MS));
+            long Hour_IN_MS = 1000 * 60 * 60;//1 hour
+            Date now=new Date();
             try {
                 Date that_time=dateFormat.parse(time);
-                if (that_time.after(one_hour_ago)) unfollow1_ids.remove(i);
+                if ((now.getTime()-that_time.getTime())>Hour_IN_MS) unfollow1_ids.remove(i);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -185,17 +187,50 @@ public class PreferenceManager extends MultiDexApplication {
         return unfollow1_ids;
     }
 
-    public static void addUnfollwed1_ids(long id){
+    public static void addUnfollwed1Hour_ids(long id){
         String key=getUserName()+seperater+"1";
-        Set<String> Unfollowed1_ids=new HashSet<String>(getUnfollwed1_ids());
+        Set<String> Unfollowed1hour_ids=new HashSet<String>(getUnfollwed1Hour_ids());
         Date now=new Date();
-        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy:MM:dd_hh:mm");
-        Unfollowed1_ids.add(String.valueOf(id)+seperater+dateFormat.format(now));
+        Unfollowed1hour_ids.add(String.valueOf(id)+seperater+dateFormat.format(now));
         editor.remove(key);
         editor.apply();
-        editor.putStringSet(key,Unfollowed1_ids);
+        editor.putStringSet(key,Unfollowed1hour_ids);
         editor.apply();
     }
+
+    public static ArrayList<String> getUnfollwed12Hour_ids() {
+        String key=getUserName()+seperater+"12";
+        Set<String> Unfollowed_12hour_ids=settings.getStringSet(key,new HashSet<String>());
+        ArrayList<String> unfollow12hour_ids=new ArrayList<>(Unfollowed_12hour_ids);
+        for (int i=0;i<unfollow12hour_ids.size();i++){
+            String time=unfollow12hour_ids.get(i).split(seperater)[1];
+            Log.e("PreferenceManager","unfollow12hour"+time);
+            long Twelve_Hour_IN_MS = 1000 * 60 * 60 * 12;//12 hours
+            Date now=new Date();
+            try {
+                Date unfollwed_time=dateFormat.parse(time);
+                long milliSec=now.getTime()-unfollwed_time.getTime();
+                left_time_12limit= 12 - (int) TimeUnit.MILLISECONDS.toHours(milliSec);
+                Log.e("PreferenceManager","unfollow12hour"+left_time_12limit);
+                if ((now.getTime()-unfollwed_time.getTime())>Twelve_Hour_IN_MS) unfollow12hour_ids.remove(i);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return unfollow12hour_ids;
+    }
+
+    public static void addUnfollwed12Hour_ids(long id){
+        String key=getUserName()+seperater+"12";
+        Set<String> Unfollowed12hour_ids=new HashSet<String>(getUnfollwed12Hour_ids());
+        Date now=new Date();
+        Unfollowed12hour_ids.add(String.valueOf(id)+seperater+dateFormat.format(now));
+        editor.remove(key);
+        editor.apply();
+        editor.putStringSet(key,Unfollowed12hour_ids);
+        editor.apply();
+    }
+
     public static void setUserName(String userName){
         editor.remove("username");
         editor.apply();
@@ -235,11 +270,13 @@ public class PreferenceManager extends MultiDexApplication {
             Log.e("freelimit",getFreeLimit()+"");
             Log.e("rewardlimit",getRewardLimit()+"");
             if (limit == 0) return UnfollowStatus.limited;
-            if (getUnfollwed1_ids().size()>=free_limit_perhour) return UnfollowStatus.limited_per_hour;
+            if (getUnfollwed1Hour_ids().size()>= limit_perhour) return UnfollowStatus.limited_per_hour;
+            if (getUnfollwed12Hour_ids().size()>= limit_per12hour)return UnfollowStatus.limited_per_12hours;
             instagram.sendRequest(new InstagramUnfollowRequest(userSummary.getPk()));
             following.remove(userSummary);
             addUnfollwed24_ids(userSummary.getPk());
-            addUnfollwed1_ids(userSummary.getPk());
+            addUnfollwed1Hour_ids(userSummary.getPk());
+            addUnfollwed12Hour_ids(userSummary.getPk());
             if (getFreeLimit()!=0) setFreeLimit(getFreeLimit()-1);
             else if (getRewardLimit()!=0 && getFreeLimit()==0) setRewardLimit(getRewardLimit()-1);
             return UnfollowStatus.success;
@@ -272,7 +309,7 @@ public class PreferenceManager extends MultiDexApplication {
     }
 
     public static String getLastLogin(){
-        return settings.getString(getUserName() + seperater + "last_login","0000:00:00_00:00");
+        return settings.getString(getUserName() + seperater + "last_login","0000:00:00_00:00 AM");
     }
 
     public static void setLastLogin(){

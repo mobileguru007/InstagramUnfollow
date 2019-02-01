@@ -69,9 +69,9 @@ public class UnfollowingDlg extends Dialog {
     @SuppressLint("SetTextI18n")
     public void setProgress(String name, int unfollowed_number){
         unfollow_name.setText(String.format(context.getResources().getString(R.string.unfollow_name),name));
-        int progress_status=(int) unfollowed_number*100/25;
+        int progress_status=(int) unfollowed_number*100/50;
         progressBar.setProgress(unfollowed_number);
         progress.setText(progress_status+"%");
-        unfollow_status.setText(String.format(context.getResources().getString(R.string.d_25),unfollowed_number));
+        unfollow_status.setText(String.format(context.getResources().getString(R.string.d_50),unfollowed_number));
     }
 }

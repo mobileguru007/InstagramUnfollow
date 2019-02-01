@@ -2,25 +2,33 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.it_tech613.zhe.instagramunfollow">
-
     <!-- Include required permissions for Google Mobile Ads to run. -->
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--<uses-permission android:name="android.permission.ACTION_MANAGE_OVERLAY_PERMISSION" />-->
+    <!--<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />-->
+    <!--<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />-->
+    <!--<uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW"-->
+        <!--tools:ignore="ProtectedPermissions" />-->
+
     <application
+        android:name=".utils.PreferenceManager"
         android:allowBackup="true"
+        android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:hardwareAccelerated="false"
-        android:largeHeap="true"
-        android:name=".utils.PreferenceManager"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:icon,android:theme">
 
+        <uses-library android:name="org.apache.http.legacy"
+            android:required="false"/>
+        <activity android:name=".activity.FaqActivity"/>
         <!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713 -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -28,9 +36,10 @@
 
         <activity
             android:name=".activity.LoginActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.NavigationActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activity.NavigationActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -39,18 +48,36 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.google.android.gms.ads.AdActivity"
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:theme="@android:style/Theme.Translucent"/>
+            android:theme="@android:style/Theme.Translucent" />
 
         <service
-            android:name=".utils.AlarmService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:name=".utils.DailyService"
+            android:enabled="true"
             android:exported="true"
-            android:enabled="true" />
-        <receiver android:name=".utils.AlarmReceiver" >
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <receiver android:name=".utils.DailyReceiver">
             <intent-filter>
-                <action android:name="com.test.intent.action.ALARM" />
+                <action android:name="com.test.intent.action.DAILYALARM" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".utils.WeeklyService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".utils.FloatingView"
+            android:enabled="true" />
+
+        <receiver android:name=".utils.WeeklyReceiver">
+            <intent-filter>
+                <action android:name="com.test.intent.action.WEEKLYALARM" />
             </intent-filter>
         </receiver>
     </application>

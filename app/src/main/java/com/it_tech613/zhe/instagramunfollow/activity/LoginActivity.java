@@ -9,6 +9,7 @@ import android.widget.EditText;
 
 import com.it_tech613.zhe.instagramunfollow.R;
 import com.it_tech613.zhe.instagramunfollow.utils.ConfirmExitDlg;
+import com.it_tech613.zhe.instagramunfollow.utils.PreferenceManager;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -19,6 +20,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        PreferenceManager.logoutManager();
 
         boolean show_faq=getIntent().getBooleanExtra("show_faq",false);
         if (show_faq){
@@ -28,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void OnYesClick(Dialog dialog) {
                             confirmExitDlg.dismiss();
+                            startActivity(new Intent(LoginActivity.this,FaqActivity.class));
                         }
 
                         @Override
@@ -35,9 +38,9 @@ public class LoginActivity extends AppCompatActivity {
                             confirmExitDlg.dismiss();
                         }
                     },
-                    "Frequently Asked Questions",
-                    null,
-                    true);
+                    getResources().getString(R.string.authorization_error),
+                    getString(R.string.goto_faq),
+                    false);
             confirmExitDlg.show();
         }
         etLogin = findViewById(R.id.etLogin);

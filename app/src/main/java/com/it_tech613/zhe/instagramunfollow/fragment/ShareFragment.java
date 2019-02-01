@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.it_tech613.zhe.instagramunfollow.activity.LoginActivity;
+import com.it_tech613.zhe.instagramunfollow.activity.NavigationActivity;
 import com.it_tech613.zhe.instagramunfollow.utils.PreferenceManager;
 import com.it_tech613.zhe.instagramunfollow.R;
 
@@ -52,6 +54,9 @@ public class ShareFragment extends Fragment {
         num_following=view.findViewById(R.id.num_following);
 //        num_posts=view.findViewById(R.id.num_posts);
         username=view.findViewById(R.id.username);
+        if (PreferenceManager.currentUser==null) {
+            getActivity().startActivityForResult(new Intent(getActivity(), LoginActivity.class), NavigationActivity.loginRequestCode);
+        }
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.placeholder(R.drawable.profile);
         requestOptions.error(R.drawable.profile);

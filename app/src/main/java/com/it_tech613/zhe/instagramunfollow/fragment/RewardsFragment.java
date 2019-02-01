@@ -42,8 +42,8 @@ public class RewardsFragment extends Fragment {
             "ca-app-pub-7166764673125229/4091087784",
             "ca-app-pub-7166764673125229/1392648549",
             "ca-app-pub-7166764673125229/6573603286",
-            "ca-app-pub-7166764673125229/6110568859",
-            "ca-app-pub-7166764673125229/4111091473",
+//            "ca-app-pub-7166764673125229/6110568859",
+//            "ca-app-pub-7166764673125229/4111091473",
             "ca-app-pub-7166764673125229/2741512941"
         };
     public static RewardsFragment newInstance() {
@@ -137,7 +137,7 @@ public class RewardsFragment extends Fragment {
                 list.add(loading_video_position,true);
                 PreferenceManager.setListRedeemed(list);
                 adapter.setList_redeemed(PreferenceManager.getListRedeemed());
-                PreferenceManager.setRewardLimit(PreferenceManager.getRewardLimit()+25);
+                PreferenceManager.setRewardLimit(PreferenceManager.getRewardLimit()+50);
                 Toast.makeText(getActivity(),
                         String.format(getString(R.string.reward_success_alert),PreferenceManager.getFreeLimit()+PreferenceManager.getRewardLimit()),
                         Toast.LENGTH_SHORT).show();

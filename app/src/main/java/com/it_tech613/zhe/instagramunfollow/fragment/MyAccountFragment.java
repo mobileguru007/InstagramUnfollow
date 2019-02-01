@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.support.v7.widget.SearchView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +55,7 @@ public class MyAccountFragment extends Fragment{
     private LinearLayout unfollow_btn_group;
     ConfirmExitDlg confirmExitDlg;
     ConstraintLayout constraintLayout;
+    View view;
     public static MyAccountFragment newInstance() {
         MyAccountFragment fragment = new MyAccountFragment();
         return fragment;
@@ -63,7 +65,7 @@ public class MyAccountFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_my_account, container, false);
+        view= inflater.inflate(R.layout.fragment_my_account, container, false);
         ImageView refresh=getActivity().findViewById(R.id.refresh);
         unfollow=getActivity().findViewById(R.id.unfollow);
         ImageView str_logo=getActivity().findViewById(R.id.str_logo);
@@ -153,12 +155,16 @@ public class MyAccountFragment extends Fragment{
         num_non_follower=view.findViewById(R.id.num_non_follower);
         today_unfollowed=view.findViewById(R.id.today_unfollowed);
         adView=view.findViewById(R.id.adView);
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PreferenceManager.logoutManager();
-                PreferenceManager.setWhitelist_ids(new HashSet<String>());
-                getActivity().startActivityForResult(new Intent(getActivity(), LoginActivity.class), 0);
+                getActivity().startActivityForResult(new Intent(getActivity(), LoginActivity.class), NavigationActivity.loginRequestCode);
             }
         });
         ArrayList<String> unfollowed_24=PreferenceManager.getUnfollwed24_ids();
@@ -166,9 +172,12 @@ public class MyAccountFragment extends Fragment{
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.placeholder(R.drawable.profile);
         requestOptions.error(R.drawable.profile);
-        Glide.with(getActivity())
-                .load(PreferenceManager.currentUser.getProfile_pic_url())
-                .into(user_profile);
+        if (PreferenceManager.currentUser!=null){
+            Glide.with(getActivity())
+                    .load(PreferenceManager.currentUser.getProfile_pic_url())
+                    .into(user_profile);
+        }
+        else user_profile.setImageResource(R.drawable.profile);
         num_followers.setText(String.valueOf(PreferenceManager.followers.size()));
         num_following.setText(String.valueOf(PreferenceManager.following.size()));
 //        num_posts.setText(String.valueOf(PreferenceManager.feedItems.size()));
@@ -179,26 +188,31 @@ public class MyAccountFragment extends Fragment{
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         adView.loadAd(adRequest);
+        RelativeLayout relativeLayout5=view.findViewById(R.id.relativeLayout5);
+        relativeLayout5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goto_upgrade();
+            }
+        });
+        TextView textView6=view.findViewById(R.id.textView6);
+        TextView textView7=view.findViewById(R.id.textView7);
+        textView6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goto_upgrade();
+            }
+        });
+        textView7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goto_upgrade();
+            }
+        });
         constraintLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                confirmExitDlg =new ConfirmExitDlg(
-                        getContext(),
-                        new ConfirmExitDlg.DialogNumberListener() {
-                            @Override
-                            public void OnYesClick(Dialog dialog) {
-                                confirmExitDlg.dismiss();
-                            }
-
-                            @Override
-                            public void OnCancelClick(Dialog dialog) {
-                                confirmExitDlg.dismiss();
-                            }
-                        },
-                        getResources().getString(R.string.upgrade),
-                        getResources().getString(R.string.upgrade_description),
-                        false);
-                confirmExitDlg.show();
+                goto_upgrade();
             }
         });
 //        adView.setAdListener(new AdListener() {
@@ -233,7 +247,26 @@ public class MyAccountFragment extends Fragment{
 //                Toast.makeText(getActivity(), "onAdLeftApplication()", Toast.LENGTH_SHORT).show();
 //            }
 //        });
-        return view;
+    }
+
+    private void goto_upgrade() {
+        confirmExitDlg =new ConfirmExitDlg(
+                getContext(),
+                new ConfirmExitDlg.DialogNumberListener() {
+                    @Override
+                    public void OnYesClick(Dialog dialog) {
+                        confirmExitDlg.dismiss();
+                    }
+
+                    @Override
+                    public void OnCancelClick(Dialog dialog) {
+                        confirmExitDlg.dismiss();
+                    }
+                },
+                getResources().getString(R.string.upgrade),
+                getResources().getString(R.string.upgrade_description),
+                false);
+        confirmExitDlg.show();
     }
 
 //    public void Unfollow10() {
@@ -247,8 +280,8 @@ public class MyAccountFragment extends Fragment{
 //    @SuppressLint("StaticFieldLeak")
 //    void unfollowTen(final boolean is_first) {
 //        InstagramUserSummary[] userIds;
-//        if (is_first) userIds = getFirstTwentyFiveUnfollowList();
-//        else userIds = getLastTwentyFiveUnfollowList();
+//        if (is_first) userIds = getFirstFiftyUnfollowList();
+//        else userIds = getLastFiftyUnfollowList();
 //        final int[] unfollowed_number = {0};
 //        unfollowingTask = new AsyncTask<InstagramUserSummary[], Void, Boolean>() {
 //            @Override
@@ -313,7 +346,7 @@ public class MyAccountFragment extends Fragment{
 //        }.execute(userIds);
 //    }
 
-//    public InstagramUserSummary[] getFirstTwentyFiveUnfollowList() {
+//    public InstagramUserSummary[] getFirstFiftyUnfollowList() {
 //        int count = PreferenceManager.unfollowers.size() >= 10 ? 10 : PreferenceManager.unfollowers.size();
 //        if (count == 0)
 //            return new InstagramUserSummary[] {new InstagramUserSummary()};
@@ -324,7 +357,7 @@ public class MyAccountFragment extends Fragment{
 //        return result;
 //    }
 //
-//    public InstagramUserSummary[] getLastTwentyFiveUnfollowList() {
+//    public InstagramUserSummary[] getLastFiftyUnfollowList() {
 //        int count = PreferenceManager.unfollowers.size() >= 10 ? 10 : PreferenceManager.unfollowers.size();
 //        if (count == 0)
 //            return new InstagramUserSummary[] {new InstagramUserSummary()};

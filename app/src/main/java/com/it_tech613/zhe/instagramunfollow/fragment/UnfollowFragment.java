@@ -79,12 +79,12 @@ public class UnfollowFragment extends Fragment {
         unfollow_btn_group.setVisibility(View.GONE);
         LinearLayout lay_followus=getActivity().findViewById(R.id.lay_followus);
         lay_followus.setVisibility(View.GONE);
-        Button first10=getActivity().findViewById(R.id.first10);
-        first10.setText(getResources().getString(R.string.first_ten));
-        Button last10=getActivity().findViewById(R.id.last10);
-        last10.setText(getResources().getString(R.string.last_ten));
+        Button first50=getActivity().findViewById(R.id.first10);
+        first50.setText(getResources().getString(R.string.first_ten));
+        Button last50=getActivity().findViewById(R.id.last10);
+        last50.setText(getResources().getString(R.string.last_ten));
         Button cancel=getActivity().findViewById(R.id.cancel_action);
-        first10.setOnClickListener(new View.OnClickListener() {
+        first50.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 unfollow_btn_group.setVisibility(View.GONE);
@@ -93,7 +93,7 @@ public class UnfollowFragment extends Fragment {
                 unfollowTen(true);
             }
         });
-        last10.setOnClickListener(new View.OnClickListener() {
+        last50.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 unfollow_btn_group.setVisibility(View.GONE);
@@ -149,10 +149,14 @@ public class UnfollowFragment extends Fragment {
                                 if (result==UnfollowStatus.success){
                                     Toast.makeText(getActivity().getBaseContext(),getString(R.string.unfollow_1)+userSummary.getFull_name(),Toast.LENGTH_LONG).show();
                                     adapter.removeItem(position);
-                                } else if (result==UnfollowStatus.failed){
+                                } else if (result==UnfollowStatus.failed)
                                     Toast.makeText(getActivity().getBaseContext(),getString(R.string.unfollow_1_fail)+userSummary.getFull_name(),Toast.LENGTH_LONG).show();
-                                } else  if (result==UnfollowStatus.limited) Toast.makeText(getActivity().getBaseContext(),getString(R.string.limited_unfollow_alert),Toast.LENGTH_LONG).show();
-                                else Toast.makeText(getActivity().getBaseContext(),getString(R.string.limited_unfollow_one_hour_alert),Toast.LENGTH_LONG).show();
+                                else  if (result==UnfollowStatus.limited)
+                                    Toast.makeText(getActivity().getBaseContext(),getString(R.string.limited_unfollow_alert),Toast.LENGTH_LONG).show();
+                                else  if (result==UnfollowStatus.limited_per_hour)
+                                    Toast.makeText(getActivity().getBaseContext(),getString(R.string.limited_unfollow_one_hour_alert),Toast.LENGTH_LONG).show();
+                                else  if (result==UnfollowStatus.limited_per_12hours)
+                                    Toast.makeText(getActivity().getBaseContext(),getString(R.string.limited_unfollow_12_hours_alert),Toast.LENGTH_LONG).show();
                                 showCredits();
                             }
                         });
@@ -313,8 +317,8 @@ public class UnfollowFragment extends Fragment {
         unfollowingDlg =new UnfollowingDlg(getActivity());
         unfollowingDlg.show();
         unfollowingDlg.setCancelable(false);
-        if (is_first) userIds = adapter.getFirstTwentyFiveUnfollowList();
-        else userIds = adapter.getLastTwentyFiveUnfollowList();
+        if (is_first) userIds = adapter.getFirstFiftyUnfollowList();
+        else userIds = adapter.getLastFiftyUnfollowList();
         final int[] unfollowed_number = {0};
         unfollowingTask = new AsyncTask<InstagramUserSummary[], Void, UnfollowStatus>() {
             @Override
@@ -335,7 +339,7 @@ public class UnfollowFragment extends Fragment {
                             }
                         });
 
-                        Thread.sleep(random.nextInt(5) * 1000);
+                        Thread.sleep(random.nextInt(10) * 1000);
                         final UnfollowStatus result=PreferenceManager.unfollow(user);
                         if (result==UnfollowStatus.success){
                             if (is_first)adapter.removeItem(0);
@@ -357,6 +361,8 @@ public class UnfollowFragment extends Fragment {
                                         Toast.makeText(getActivity().getBaseContext(),getString(R.string.unfollow_1_fail)+user.getFull_name(),Toast.LENGTH_LONG).show();
                                     } else if (result==UnfollowStatus.limited_per_hour){
                                         Toast.makeText(getActivity().getBaseContext(),getString(R.string.limited_unfollow_one_hour_alert),Toast.LENGTH_LONG).show();
+                                    } else if (result==UnfollowStatus.limited_per_12hours){
+                                        Toast.makeText(getActivity().getBaseContext(),getString(R.string.limited_unfollow_12_hours_alert),Toast.LENGTH_LONG).show();
                                     }
                                 }
                             });

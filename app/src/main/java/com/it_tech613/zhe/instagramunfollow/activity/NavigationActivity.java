@@ -5,13 +5,17 @@ import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.StrictMode;
+import android.provider.Settings;
 import android.support.annotation.ColorRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -20,7 +24,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
@@ -30,7 +33,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
-import com.it_tech613.zhe.instagramunfollow.utils.AlarmReceiver;
+import com.it_tech613.zhe.instagramunfollow.utils.DailyReceiver;
 import com.it_tech613.zhe.instagramunfollow.utils.ConfirmExitDlg;
 import com.it_tech613.zhe.instagramunfollow.utils.DelayedProgressDialog;
 import com.it_tech613.zhe.instagramunfollow.utils.LoadingDlg;
@@ -41,19 +44,13 @@ import com.it_tech613.zhe.instagramunfollow.fragment.RewardsFragment;
 import com.it_tech613.zhe.instagramunfollow.fragment.ShareFragment;
 import com.it_tech613.zhe.instagramunfollow.fragment.UnfollowFragment;
 import com.it_tech613.zhe.instagramunfollow.fragment.WhiteListFragment;
+import com.it_tech613.zhe.instagramunfollow.utils.WeeklyReceiver;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -67,12 +64,13 @@ import dev.niekirk.com.instagram4android.requests.payload.InstagramGetUserFollow
 import dev.niekirk.com.instagram4android.requests.payload.InstagramLoginResult;
 import dev.niekirk.com.instagram4android.requests.payload.InstagramUserSummary;
 
-public class NavigationActivity extends AppCompatActivity implements View.OnFocusChangeListener {
+public class NavigationActivity extends AppCompatActivity{
     private ConfirmExitDlg confirmExitDlg;
     AlarmManager alarmManager;
     AHBottomNavigation bottomNavigation;
     private PendingIntent pendingIntent;
     private static NavigationActivity inst;
+    public static final int loginRequestCode=0;
     boolean notificationVisible=false;
 //    NoSwipePager viewPager;
 //    BottomBarAdapter pagerAdapter;
@@ -82,6 +80,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
     CircleImageView userProfileImage;
     String username="";
     private InterstitialAd mInterstitialAd;
+    private static final int REQUEST_OVERLAY = 1234;
 
     public static NavigationActivity instance() {
         return inst;
@@ -100,6 +99,10 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
 //        setSupportActionBar(toolbar);
 //        //noinspection ConstantConditions
 //        getSupportActionBar().setTitle("Bottom Navigation");
+        if (PreferenceManager.instagram!=null) {
+            setUpGUI();
+            return;
+        }
         userProfileImage =findViewById(R.id.profile);
         if (savedInstanceState != null)
             login(savedInstanceState.getString("username"),
@@ -109,6 +112,13 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                     PreferenceManager.getPassword());
         else
             startLoginActivity(false);
+//        if(Build.VERSION.SDK_INT >= 23) {
+//            if (!Settings.canDrawOverlays(this)) {
+//                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+//                        Uri.parse("package:" + getPackageName()));
+//                startActivityForResult(intent, REQUEST_OVERLAY);
+//            }
+//        }
     }
 
     private void loadInterstitialAd() {
@@ -151,12 +161,13 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
         bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
-                Fragment selectedFragment;
-                bottomNavigation.removeAllItems();
-                bottomNavigation.refresh();
+                Fragment selectedFragment=null;
                 ImageView refresh=findViewById(R.id.refresh);
                 switch (position){
                     case 0:
+                        if(bottomNavigation.getCurrentItem()==0) break;
+                        bottomNavigation.removeAllItems();
+                        bottomNavigation.refresh();
                         selectedFragment=UnfollowFragment.newInstance();
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon_selected, R.color.colorPrimary));
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact, R.color.colorPrimary));
@@ -165,6 +176,9 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile,R.color.colorPrimary));
                         break;
                     case 1:
+                        if(bottomNavigation.getCurrentItem()==1) break;
+                        bottomNavigation.removeAllItems();
+                        bottomNavigation.refresh();
                         selectedFragment=WhiteListFragment.newInstance();
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon, R.color.colorPrimary));
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact_selected, R.color.colorPrimary));
@@ -173,6 +187,9 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile,R.color.colorPrimary));
                         break;
                     case 2:
+                        if(bottomNavigation.getCurrentItem()==2) break;
+                        bottomNavigation.removeAllItems();
+                        bottomNavigation.refresh();
                         selectedFragment=ShareFragment.newInstance();
                         refresh.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -188,6 +205,9 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile,R.color.colorPrimary));
                         break;
                     case 3:
+                        if(bottomNavigation.getCurrentItem()==3) break;
+                        bottomNavigation.removeAllItems();
+                        bottomNavigation.refresh();
                         selectedFragment=RewardsFragment.newInstance();
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon, R.color.colorPrimary));
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact, R.color.colorPrimary));
@@ -196,6 +216,9 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile,R.color.colorPrimary));
                         break;
                     case 4:
+                        if(bottomNavigation.getCurrentItem()==4) break;
+                        bottomNavigation.removeAllItems();
+                        bottomNavigation.refresh();
                         selectedFragment=MyAccountFragment.newInstance();
                         refresh.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -211,6 +234,8 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile_selected,R.color.colorPrimary));
                         break;
                     default:
+                        bottomNavigation.removeAllItems();
+                        bottomNavigation.refresh();
                         selectedFragment=UnfollowFragment.newInstance();
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_0), R.drawable.menuicon_selected , R.color.colorPrimary));
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_1), R.drawable.add_contact , R.color.colorPrimary));
@@ -219,7 +244,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                         bottomNavigation.addItem(new AHBottomNavigationItem(getString(R.string.bottomnav_title_4), R.drawable.profile ,R.color.colorPrimary));
                         break;
                 }
-                getSupportFragmentManager().beginTransaction().replace(R.id.frame,selectedFragment).addToBackStack("tag").commitAllowingStateLoss();
+               if (selectedFragment!=null)getSupportFragmentManager().beginTransaction().replace(R.id.frame,selectedFragment).addToBackStack("tag").commitAllowingStateLoss();
 //                viewPager.setCurrentItem(position);
                 Log.e("selected_tab",position+"");
                 // remove notification badge
@@ -236,7 +261,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
     public void startLoginActivity(boolean show_faq) {
         Intent intent=new Intent(this, LoginActivity.class);
         intent.putExtra("show_faq",show_faq);
-        startActivityForResult(intent, 0);
+        startActivityForResult(intent, loginRequestCode);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -328,13 +353,43 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
         }
     }
 
+//    public void showRateUs(){
+//        confirmExitDlg =new ConfirmExitDlg(
+//                NavigationActivity.this,
+//                new ConfirmExitDlg.DialogNumberListener() {
+//                    @Override
+//                    public void OnYesClick(Dialog dialog) {
+//                        confirmExitDlg.dismiss();
+//                        final Intent intent = new Intent(Intent.ACTION_VIEW);
+//                        try {
+//                            if (getPackageManager().getPackageInfo("com.android.vending", 0) != null) {
+//                                intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.it_tech613.zhe.instagramunfollow"));
+//                                intent.setPackage("com.android.vending");
+//                            }
+//                        } catch (PackageManager.NameNotFoundException ignored) {}
+//                        intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.it_tech613.zhe.instagramunfollow"));
+//                        startActivity(intent);
+//                    }
+//
+//                    @Override
+//                    public void OnCancelClick(Dialog dialog) {
+//                        confirmExitDlg.dismiss();
+//                    }
+//                },
+//                getResources().getString(R.string.rateus_title),
+//                getResources().getString(R.string.rateus_body),
+//                false);
+//        confirmExitDlg.show();
+//    }
     @Override
     protected void onStop() {
-        super.onStop();
-        if (!username.equals("")) PreferenceManager.setLastLogin();
+        if (username!=null) if (!username.equals("")) PreferenceManager.setLastLogin();
         //Daily Push Notification
-        AlarmReceiver.setCtx(getApplicationContext());
-        AlarmReceiver.setAlarm(true);
+        DailyReceiver.setCtx(getApplicationContext());
+        DailyReceiver.setAlarm(true);
+        WeeklyReceiver.setCtx(getApplicationContext());
+        WeeklyReceiver.setAlarm(true);
+        super.onStop();
     }
 
     @Override
@@ -398,6 +453,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                 final long userId = PreferenceManager.instagram.getUserId();
                 try {
                     result = PreferenceManager.instagram.sendRequest(new InstagramGetUserFollowersRequest(userId));
+                    if(result==null) return null;
                     followers.addAll(result.getUsers());
                     runOnUiThread(new Runnable() {
                         @Override
@@ -407,6 +463,7 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
                     });
                     while (result.getNext_max_id() != null){
                         result = PreferenceManager.instagram.sendRequest(new InstagramGetUserFollowersRequest(userId, result.getNext_max_id()));
+                        if(result==null) return null;
                         followers.addAll(result.getUsers());
                         runOnUiThread(new Runnable() {
                             @Override
@@ -484,8 +541,14 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != RESULT_OK)
-            startLoginActivity(false);
+        if (resultCode != RESULT_OK) {
+            if (requestCode==loginRequestCode) startLoginActivity(false);
+            else if (requestCode == REQUEST_OVERLAY) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                }
+            }
+        }
         else
             login(data.getStringExtra("username"),
                     data.getStringExtra("password"));
@@ -583,8 +646,4 @@ public class NavigationActivity extends AppCompatActivity implements View.OnFocu
         bottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_HIDE);
     }
 
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (v.getId()==R.id.frame) findViewById(R.id.unfollow_btn_group).setVisibility(View.GONE);
-    }
 }
