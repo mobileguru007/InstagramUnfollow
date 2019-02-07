@@ -24,13 +24,14 @@ import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import com.it_tech613.zhe.instagramunfollow.R;
+import com.it_tech613.zhe.instagramunfollow.activity.NavigationActivity;
 import com.it_tech613.zhe.instagramunfollow.utils.PreferenceManager;
 import com.it_tech613.zhe.instagramunfollow.utils.RewardVideosAdapter;
 
 import java.util.ArrayList;
 
 public class RewardsFragment extends Fragment {
-    private SpinKitView spin_kit;
+//    private SpinKitView spin_kit;
     private RewardedVideoAd mRewardedVideoAd;
     SwipeRefreshLayout refreshLayout;
     RecyclerView recycler;
@@ -73,8 +74,8 @@ public class RewardsFragment extends Fragment {
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         adView.loadAd(adRequest);
-        spin_kit=view.findViewById(R.id.spin_kit);
-        spin_kit.setVisibility(View.GONE);
+//        spin_kit=view.findViewById(R.id.spin_kit);
+//        spin_kit.setVisibility(View.GONE);
         // Use an activity context to get the rewarded video instance.
 
 
@@ -83,7 +84,8 @@ public class RewardsFragment extends Fragment {
         adapter=new RewardVideosAdapter() {
             @Override
             public void watchRewardVideo(int position) {
-                spin_kit.setVisibility(View.VISIBLE);
+//                spin_kit.setVisibility(View.VISIBLE);
+                NavigationActivity.instance().kpHUD.setLabel("Loading Reward ads...").show();
                 loadRewardedVideoAd(reward_ids[position]);
                 loading_video_position=position;
             }
@@ -107,7 +109,8 @@ public class RewardsFragment extends Fragment {
             public void onRewardedVideoAdLoaded() {
 //                Toast.makeText(getActivity(), "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
                 if (mRewardedVideoAd.isLoaded()) {
-                    spin_kit.setVisibility(View.GONE);
+//                    spin_kit.setVisibility(View.GONE);
+                    NavigationActivity.instance().kpHUD.dismiss();
                     mRewardedVideoAd.show();
                 }
             }
@@ -152,7 +155,8 @@ public class RewardsFragment extends Fragment {
 
             @Override
             public void onRewardedVideoAdFailedToLoad(int i) {
-                spin_kit.setVisibility(View.GONE);
+//                spin_kit.setVisibility(View.GONE);
+                NavigationActivity.instance().kpHUD.dismiss();
                 Toast.makeText(getActivity(), getString(R.string.reward_fail_alert), Toast.LENGTH_SHORT).show();
 
             }

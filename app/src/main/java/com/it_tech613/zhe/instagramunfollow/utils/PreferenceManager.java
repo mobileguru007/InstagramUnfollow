@@ -1,5 +1,6 @@
 package com.it_tech613.zhe.instagramunfollow.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
@@ -8,6 +9,8 @@ import android.util.Log;
 
 import com.google.android.gms.ads.MobileAds;
 import com.it_tech613.zhe.instagramunfollow.R;
+
+import org.solovyev.android.checkout.Billing;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +29,8 @@ import dev.niekirk.com.instagram4android.requests.payload.InstagramLoggedUser;
 import dev.niekirk.com.instagram4android.requests.payload.InstagramUserSummary;
 
 public class PreferenceManager extends MultiDexApplication {
+
+    public static PreferenceManager mInstance;
     public static SharedPreferences.Editor editor;
     public static SharedPreferences settings;
     public static Instagram4Android instagram;
@@ -46,10 +51,28 @@ public class PreferenceManager extends MultiDexApplication {
     public static boolean is_credit_noti_showed=false;
     public static boolean is_rateus_noti_showed=false;
     public static int left_time_12limit=12;
+    private final Billing mBilling = new Billing(this, new Billing.DefaultConfiguration() {
+        @Override
+        public String getPublicKey() {
+            // encrypted public key of the app. Plain version can be found in Google Play's Developer
+            // Console in Service & APIs section under "YOUR LICENSE KEY FOR THIS APPLICATION" title.
+            // A naive encryption algorithm is used to "protect" the key. See more about key protection
+            // here: https://developer.android.com/google/play/billing/billing_best_practices.html#key
+            final String s = "PixnMSYGLjg7Ah0xDwYILlVZUy0sIiBoMi4jLDcoXTcNLiQjKgtlIC48NiRcHxwKHEcYEyZrPyMWXFRpV10VES9ENz" +
+                    "g1Hj06HTV1MCAHJlpgEDcmOxFDEkA8OiQRKjEQDxhRWVVEMBYmNl1AJghcKUAYVT15KSQgBQABMgwqKSlqF1gZBA4fAw5rMyxKI" +
+                    "w9LJFc7AhxZGjoPATgRUiUjKSsOWyRKDi4nIA9lKgAGOhMLDF06CwoKGFR6Wj0hGwReS10NXzQTIREhKlkuMz4XDTwUQjRCJUA+" +
+                    "VjQVPUIoPicOLQJCLxs8RjZnJxY1OQNLKgQCPj83AyBEFSAJEk5UClYjGxVLNBU3FS4DCztENQMuOk5rFVclKz88AAApPgADGFx" +
+                    "EEV5eQAF7QBhdQEE+Bzc5MygCAwlEFzclKRB7FB0uFgwPKgAvLCk2OyFiKxkgIy8BBQYjFy4/E1ktJikrEVlKJVYIHh16NDwtDC" +
+                    "U0Vg8JNzoQBwQWOwk1GzZ4FT8fWicwITcRJi8=";
+            return Encryption.decrypt(s, "instunfollows2019@gmail.com");
+        }
+    });
+    @SuppressLint("CommitPrefEdits")
     @Override
     public void onCreate() {
         super.onCreate();
         //TODO APP ID
+        mInstance=this;
         MobileAds.initialize(this, "ca-app-pub-7166764673125229~3007945136");
         settings = getSharedPreferences(getString(R.string.pref_name), Context.MODE_PRIVATE);
         editor = settings.edit();
@@ -70,6 +93,9 @@ public class PreferenceManager extends MultiDexApplication {
 
     }
 
+    public Billing getBilling() {
+        return mBilling;
+    }
 
     public static void logoutManager(){
         setIsSaved(false);
@@ -353,5 +379,19 @@ public class PreferenceManager extends MultiDexApplication {
         editor.apply();
         editor.putString(getUserName() + seperater + "access_token",accessToken);
         editor.apply();
+    }
+
+    public static void setAlarm(){
+        if (!settings.getBoolean("alarm_set",false)){
+            //Daily Push Notification
+            DailyReceiver.setCtx(mInstance);
+            DailyReceiver.setAlarm(true);
+            WeeklyReceiver.setCtx(mInstance);
+            WeeklyReceiver.setAlarm(true);
+            editor.remove("alarm_set");
+            editor.apply();
+            editor.putBoolean("alarm_set",true);
+            editor.apply();
+        }
     }
 }

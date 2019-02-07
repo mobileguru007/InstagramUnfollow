@@ -58,7 +58,6 @@ public class DailyReceiver extends BroadcastReceiver {
         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
         calendar.set(Calendar.MINUTE, minuteOfHour);
         long when=calendar.getTimeInMillis();
-        when=System.currentTimeMillis()+120000;
         /* fire the broadcast */
         alarm.setRepeating(AlarmManager.RTC_WAKEUP, when,AlarmManager.INTERVAL_DAY, getPendingIntent());
         Log.e("DailyReceiver", "Alarm is set successfully");

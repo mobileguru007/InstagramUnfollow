@@ -61,7 +61,6 @@ public class WeeklyReceiver extends BroadcastReceiver {
         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
         calendar.set(Calendar.MINUTE, minuteOfHour);
         long when=calendar.getTimeInMillis();
-        when=System.currentTimeMillis()+10000;
         alarm.setRepeating(AlarmManager.RTC_WAKEUP, when,AlarmManager.INTERVAL_DAY*7, getPendingIntent());
         Log.e("WeeklyReceiver", "Alarm is set successfully");
     }

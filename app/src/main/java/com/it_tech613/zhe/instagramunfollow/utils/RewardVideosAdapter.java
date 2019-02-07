@@ -23,6 +23,7 @@ public abstract class RewardVideosAdapter extends RecyclerView.Adapter<RewardVid
     @Override
     public void onBindViewHolder(final UserViewHolder holder, final int i) {
         if (!list_redeemed.get(i)) {
+            holder.itemView.setBackgroundColor(holder.itemView.getContext().getResources().getColor(R.color.white));
             holder.watch.setText(holder.itemView.getContext().getString(R.string.watch));
             holder.watch.setOnClickListener(new View.OnClickListener() {
                 @Override

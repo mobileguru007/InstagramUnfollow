@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -135,6 +136,7 @@ public abstract class UnfollowAdapter extends RecyclerView.Adapter<UnfollowAdapt
             public void onClick(View v) {
                 if (isBlocked)
                     return;
+                holder.add_to_whitelist.setClickable(false);
                 PreferenceManager.addWhitelist_ids(user_id, users.get(position));
                 removeItem(position);
             }

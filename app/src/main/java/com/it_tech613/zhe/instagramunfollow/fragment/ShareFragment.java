@@ -58,6 +58,10 @@ public class ShareFragment extends Fragment {
             getActivity().startActivityForResult(new Intent(getActivity(), LoginActivity.class), NavigationActivity.loginRequestCode);
         }
         RequestOptions requestOptions = new RequestOptions();
+        if (PreferenceManager.currentUser==null){
+            PreferenceManager.logoutManager();
+            NavigationActivity.instance().startLoginActivity(false);
+        }
         requestOptions.placeholder(R.drawable.profile);
         requestOptions.error(R.drawable.profile);
         Glide.with(getActivity())

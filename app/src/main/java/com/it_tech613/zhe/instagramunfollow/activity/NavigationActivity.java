@@ -45,6 +45,15 @@ import com.it_tech613.zhe.instagramunfollow.fragment.ShareFragment;
 import com.it_tech613.zhe.instagramunfollow.fragment.UnfollowFragment;
 import com.it_tech613.zhe.instagramunfollow.fragment.WhiteListFragment;
 import com.it_tech613.zhe.instagramunfollow.utils.WeeklyReceiver;
+import com.kaopiz.kprogresshud.KProgressHUD;
+
+import org.solovyev.android.checkout.ActivityCheckout;
+import org.solovyev.android.checkout.BillingRequests;
+import org.solovyev.android.checkout.Checkout;
+import org.solovyev.android.checkout.EmptyRequestListener;
+import org.solovyev.android.checkout.Inventory;
+import org.solovyev.android.checkout.ProductTypes;
+import org.solovyev.android.checkout.Purchase;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,18 +83,38 @@ public class NavigationActivity extends AppCompatActivity{
     boolean notificationVisible=false;
 //    NoSwipePager viewPager;
 //    BottomBarAdapter pagerAdapter;
-
+    private final String purchaseItemName="sku_01";
     DelayedProgressDialog spinner = new DelayedProgressDialog();
     LoadingDlg loadingDlg;
     CircleImageView userProfileImage;
     String username="";
+    public KProgressHUD kpHUD;
     private InterstitialAd mInterstitialAd;
-    private static final int REQUEST_OVERLAY = 1234;
+    private class PurchaseListener extends EmptyRequestListener<Purchase> {
+        @Override
+        public void onSuccess(Purchase purchase) {
+            // here you can process the loaded purchase
+        }
+
+        @Override
+        public void onError(int response, Exception e) {
+            // handle errors here
+        }
+    }
+
+    private class InventoryCallback implements Inventory.Callback {
+        @Override
+        public void onLoaded(Inventory.Products products) {
+            // your code here
+        }
+    }
+
+    private final ActivityCheckout mCheckout = Checkout.forActivity(this, PreferenceManager.mInstance.getBilling());
+    private Inventory mInventory;
 
     public static NavigationActivity instance() {
         return inst;
     }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -99,6 +128,14 @@ public class NavigationActivity extends AppCompatActivity{
 //        setSupportActionBar(toolbar);
 //        //noinspection ConstantConditions
 //        getSupportActionBar().setTitle("Bottom Navigation");
+        PreferenceManager.setAlarm();
+        kpHUD = KProgressHUD.create(this)
+                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                .setCancellable(true)
+                .setLabel("Unfollowing")
+                .setAnimationSpeed(1)
+                .setDimAmount(0.5f);
+        loadingDlg=new LoadingDlg(this);
         if (PreferenceManager.instagram!=null) {
             setUpGUI();
             return;
@@ -119,6 +156,7 @@ public class NavigationActivity extends AppCompatActivity{
 //                startActivityForResult(intent, REQUEST_OVERLAY);
 //            }
 //        }
+        preparePurchasing();
     }
 
     private void loadInterstitialAd() {
@@ -145,6 +183,13 @@ public class NavigationActivity extends AppCompatActivity{
         AdRequest adRequest = new AdRequest.Builder().build();
         mInterstitialAd.loadAd(adRequest);
     }
+
+    @Override
+    protected void onDestroy() {
+        mCheckout.stop();
+        super.onDestroy();
+    }
+
     private void setUpGUI() {
 //        setupViewPager();
         bottomNavigation=(AHBottomNavigation) findViewById(R.id.bottom_navigation);
@@ -194,6 +239,10 @@ public class NavigationActivity extends AppCompatActivity{
                         refresh.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                if(spinner.isAdded())
+                                {
+                                    return; //or return false/true, based on where you are calling from
+                                }
                                 spinner.show(getSupportFragmentManager(), "login");
                                 loadData_following(false);
                             }
@@ -223,6 +272,10 @@ public class NavigationActivity extends AppCompatActivity{
                         refresh.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                if(spinner.isAdded())
+                                {
+                                    return; //or return false/true, based on where you are calling from
+                                }
                                 spinner.show(getSupportFragmentManager(), "login");
                                 loadData_following(false);
                             }
@@ -268,7 +321,6 @@ public class NavigationActivity extends AppCompatActivity{
     private void login(final String username, final String password) {
         this.username=username;
 //        loadInterstitialAd();
-        loadingDlg=new LoadingDlg(this);
         loadingDlg.show();
         loadingDlg.setCancelable(false);
 //        spinner.show(getSupportFragmentManager(), "login");
@@ -384,11 +436,6 @@ public class NavigationActivity extends AppCompatActivity{
     @Override
     protected void onStop() {
         if (username!=null) if (!username.equals("")) PreferenceManager.setLastLogin();
-        //Daily Push Notification
-        DailyReceiver.setCtx(getApplicationContext());
-        DailyReceiver.setAlarm(true);
-        WeeklyReceiver.setCtx(getApplicationContext());
-        WeeklyReceiver.setAlarm(true);
         super.onStop();
     }
 
@@ -408,6 +455,10 @@ public class NavigationActivity extends AppCompatActivity{
             @Override
             protected Void doInBackground(Void... voids) {
                 InstagramGetUserFollowersResult result;
+                if (PreferenceManager.instagram==null) {
+                    cancel(true);
+                    startLoginActivity(false);
+                }
                 final long userId = PreferenceManager.instagram.getUserId();
                 try {
                     result = PreferenceManager.instagram.sendRequest(new InstagramGetUserFollowingRequest(userId));
@@ -450,6 +501,10 @@ public class NavigationActivity extends AppCompatActivity{
             @Override
             protected Void doInBackground(Void... voids) {
                 InstagramGetUserFollowersResult result;
+                if (PreferenceManager.instagram==null) {
+                    cancel(true);
+                    startLoginActivity(false);
+                }
                 final long userId = PreferenceManager.instagram.getUserId();
                 try {
                     result = PreferenceManager.instagram.sendRequest(new InstagramGetUserFollowersRequest(userId));
@@ -542,16 +597,35 @@ public class NavigationActivity extends AppCompatActivity{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK) {
-            if (requestCode==loginRequestCode) startLoginActivity(false);
-            else if (requestCode == REQUEST_OVERLAY) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-                }
-            }
+            startLoginActivity(false);
         }
-        else
-            login(data.getStringExtra("username"),
+        else{
+            if (requestCode==loginRequestCode)
+                login(data.getStringExtra("username"),
                     data.getStringExtra("password"));
+            else mCheckout.onActivityResult(requestCode, resultCode, data);
+        }
+
+    }
+
+    private void preparePurchasing(){
+        mCheckout.start();
+
+        mCheckout.createPurchaseFlow(new PurchaseListener());
+
+        mInventory = mCheckout.makeInventory();
+        mInventory.load(Inventory.Request.create()
+                .loadAllPurchases()
+                .loadSkus(ProductTypes.IN_APP, purchaseItemName), new InventoryCallback());
+    }
+
+    public void startPurchasing(){
+        mCheckout.whenReady(new Checkout.EmptyListener() {
+            @Override
+            public void onReady(BillingRequests requests) {
+                requests.purchase(ProductTypes.IN_APP, purchaseItemName, null, mCheckout.getPurchaseFlow());
+            }
+        });
     }
 
     private int fetchColor(@ColorRes int color) {

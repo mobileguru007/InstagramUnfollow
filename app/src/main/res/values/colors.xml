@@ -13,4 +13,5 @@
     <color name="red">#c92323</color>
     <color name="red_pressed">#711414</color>
     <color name="grey_transparent">#55333333</color>
+    <color name="white">#FFFFFF</color>
 </resources>
