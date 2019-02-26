@@ -256,7 +256,6 @@ public class MyAccountFragment extends Fragment{
                     @Override
                     public void OnYesClick(Dialog dialog) {
                         confirmExitDlg.dismiss();
-                        NavigationActivity.instance().startPurchasing();
                     }
 
                     @Override

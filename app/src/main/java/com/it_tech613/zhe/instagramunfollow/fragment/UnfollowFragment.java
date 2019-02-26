@@ -142,7 +142,8 @@ public class UnfollowFragment extends Fragment {
             @SuppressLint("StaticFieldLeak")
             @Override
             public void unfollow(final int position, final InstagramUserSummary userSummary) {
-                NavigationActivity.instance().kpHUD.setLabel("Unfollowing...").show();
+                loadInterstitialAd();
+                NavigationActivity.instance().kpHUD.setLabel("Unfollowing...").setCancellable(false).show();
                 new AsyncTask<Void, Void, UnfollowStatus>() {
                     @Override
                     protected UnfollowStatus doInBackground(Void... voids) {

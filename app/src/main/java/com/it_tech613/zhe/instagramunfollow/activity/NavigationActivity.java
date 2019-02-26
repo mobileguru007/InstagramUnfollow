@@ -47,13 +47,6 @@ import com.it_tech613.zhe.instagramunfollow.fragment.WhiteListFragment;
 import com.it_tech613.zhe.instagramunfollow.utils.WeeklyReceiver;
 import com.kaopiz.kprogresshud.KProgressHUD;
 
-import org.solovyev.android.checkout.ActivityCheckout;
-import org.solovyev.android.checkout.BillingRequests;
-import org.solovyev.android.checkout.Checkout;
-import org.solovyev.android.checkout.EmptyRequestListener;
-import org.solovyev.android.checkout.Inventory;
-import org.solovyev.android.checkout.ProductTypes;
-import org.solovyev.android.checkout.Purchase;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,27 +83,6 @@ public class NavigationActivity extends AppCompatActivity{
     String username="";
     public KProgressHUD kpHUD;
     private InterstitialAd mInterstitialAd;
-    private class PurchaseListener extends EmptyRequestListener<Purchase> {
-        @Override
-        public void onSuccess(Purchase purchase) {
-            // here you can process the loaded purchase
-        }
-
-        @Override
-        public void onError(int response, Exception e) {
-            // handle errors here
-        }
-    }
-
-    private class InventoryCallback implements Inventory.Callback {
-        @Override
-        public void onLoaded(Inventory.Products products) {
-            // your code here
-        }
-    }
-
-    private final ActivityCheckout mCheckout = Checkout.forActivity(this, PreferenceManager.mInstance.getBilling());
-    private Inventory mInventory;
 
     public static NavigationActivity instance() {
         return inst;
@@ -156,7 +128,6 @@ public class NavigationActivity extends AppCompatActivity{
 //                startActivityForResult(intent, REQUEST_OVERLAY);
 //            }
 //        }
-        preparePurchasing();
     }
 
     private void loadInterstitialAd() {
@@ -182,12 +153,6 @@ public class NavigationActivity extends AppCompatActivity{
 
         AdRequest adRequest = new AdRequest.Builder().build();
         mInterstitialAd.loadAd(adRequest);
-    }
-
-    @Override
-    protected void onDestroy() {
-        mCheckout.stop();
-        super.onDestroy();
     }
 
     private void setUpGUI() {
@@ -603,29 +568,8 @@ public class NavigationActivity extends AppCompatActivity{
             if (requestCode==loginRequestCode)
                 login(data.getStringExtra("username"),
                     data.getStringExtra("password"));
-            else mCheckout.onActivityResult(requestCode, resultCode, data);
         }
 
-    }
-
-    private void preparePurchasing(){
-        mCheckout.start();
-
-        mCheckout.createPurchaseFlow(new PurchaseListener());
-
-        mInventory = mCheckout.makeInventory();
-        mInventory.load(Inventory.Request.create()
-                .loadAllPurchases()
-                .loadSkus(ProductTypes.IN_APP, purchaseItemName), new InventoryCallback());
-    }
-
-    public void startPurchasing(){
-        mCheckout.whenReady(new Checkout.EmptyListener() {
-            @Override
-            public void onReady(BillingRequests requests) {
-                requests.purchase(ProductTypes.IN_APP, purchaseItemName, null, mCheckout.getPurchaseFlow());
-            }
-        });
     }
 
     private int fetchColor(@ColorRes int color) {
